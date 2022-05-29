@@ -1,0 +1,5 @@
+excelPath:./Excel/;
+dataPath:./DataTable/;
+classPath:./CSharp/;
+exportType:Json;
+isExportServer:False
