@@ -304,8 +304,7 @@ namespace Dadabase
         }
 
         private void AddJsonData(string data, string name, string type, Dictionary<string, Dictionary<string, int>> enumDic, Dictionary<string, bool> arrayDic, Dictionary<string, List<string>> dicDic, Dictionary<string, bool> dicTypeDic, Dictionary<string, bool> dicAddedDic)
-        {
-            Logger.Log(type);
+        {           
             if (type == "int" || type == "float" || type == "bool")
             {
                 if (type == "bool")
@@ -378,7 +377,6 @@ namespace Dadabase
                 }
                 else
                 {
-
                     if (dicTypeDic[name])
                     {
                         dataStr += $"\"{dicDic[name][dicIndex]}\":\"{data}\",";
@@ -408,16 +406,14 @@ namespace Dadabase
 
         }
 
-
         private void SaveData(string dataStr, string className)
         {
             switch (Config.I.exportType)
             {
                 case Config.ExportType.Json:
-
                     dataStr = "[{" + dataStr.Substring(0, dataStr.Length - 2) + "]";
-                    Logger.Log(dataStr);
-                    FileTool.WriteString($"{Config.I.dataPath}{className}.json", dataStr); break;
+                    FileTool.WriteString($"{Config.I.dataPath}{className}.json", dataStr);
+                    break;
                 case Config.ExportType.Bytes: FileTool.WriteString($"{Config.I.dataPath}{className}", dataStr); break;
                 case Config.ExportType.Protobuf: FileTool.WriteString($"{Config.I.dataPath}{className}.proto", dataStr); break;
             }

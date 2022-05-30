@@ -10,15 +10,12 @@ namespace DataTable
     {
         static void Main(string[] args)
         {
-
             ExcelTool excelTool = new ExcelTool();
-
             excelTool.CreateDataTable("./Excel/Hero.xlsx");
 
             //excelTool.Test("./Excel/Hero.xlsx");
 
-
-            Logger.Log("Press Any Key Out:");
+            Logger.Log("Press Any Key Out!");
             Console.ReadKey();
         }
     }
