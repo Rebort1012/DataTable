@@ -9,8 +9,19 @@ namespace DataTable
 {
     internal class Config
     {
-        public Config()
-        { 
+        private static Config instance;
+        public static Config I
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new Config();
+                return instance;
+            }
+        }
+
+        private Config()
+        {
             LoadConfig();
         }
 
@@ -19,7 +30,7 @@ namespace DataTable
             Json,
             Protobuf,
             Xml,
-            Byte,
+            Bytes,
         }
 
         public string configPath;
@@ -43,14 +54,14 @@ namespace DataTable
 
                 switch (name)
                 {
-                    case "excelPath":excelPath = tempStrs[1];break;
+                    case "excelPath": excelPath = tempStrs[1]; break;
                     case "dataPath": dataPath = tempStrs[1]; break;
                     case "classPath": classPath = tempStrs[1]; break;
-                    case "exportType": exportType = (ExportType)Enum.Parse(typeof(ExportType), tempStrs[1]);  break;
-                    case "isExportServer": isExportServer = tempStrs[1].ToLower() != "false";  break;
+                    case "exportType": exportType = (ExportType)Enum.Parse(typeof(ExportType), tempStrs[1]); break;
+                    case "isExportServer": isExportServer = tempStrs[1].ToLower() != "false"; break;
                 }
-               
-            }   
+
+            }
         }
     }
 }

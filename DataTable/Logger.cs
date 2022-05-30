@@ -8,8 +8,8 @@ namespace DataTable
 {
     internal class Logger
     {
-        public static void Log(string value)
-        { 
+        public static void Log(Object value)
+        {
             Console.WriteLine(value);
         }
 
@@ -19,6 +19,5 @@ namespace DataTable
             Console.WriteLine(value);
             Console.ForegroundColor = ConsoleColor.White;
         }
-
     }
 }

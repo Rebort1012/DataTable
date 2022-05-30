@@ -1,79 +1,55 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class Hero
+namespace Dadabase
 {
-
-    public int Id
+    [Serializable]
+    public class Hero
     {
-        get;
-    }
 
-    public str Name
-    {
-        get;
-    }
+        public int Id{ get;private set; }
 
-    public string PerfabName
-    {
-        get;
-    }
+        public string Name{ get;private set; }
 
-    public enum EnumJob
-    {
-        ,
-        Sword,
-        Magic,
-        Bow,
-    }
+        public string PerfabName{ get;private set; }
 
-    public enum Job
-    {
-        get;
-    }
+        public enum EnumJob
+        {
+            Sword,
+            Magic,
+            Bow,
+        }
 
-    public int Icon
-    {
-        get;
-    }
+        public EnumJob mJob;
 
-    public int MP
-    {
-        get;
-    }
+        public int Icon{ get;private set; }
 
-    public int Exp
-    {
-        get;
-    }
+        public int MP{ get;private set; }
 
-    public int Rank
-    {
-        get;
-    }
+        public int Exp{ get;private set; }
 
-    public int AttackID
-    {
-        get;
-    }
+        public int Rank{ get;private set; }
 
-    public int SkillID
-    {
-        get;
-    }
+        public int AttackID{ get;private set; }
 
-    public bool IsHero
-    {
-        get;
-    }
+        public int SkillID{ get;private set; }
 
-    public int TalentID
-    {
-        get;
-    }
+        public bool IsHero{ get;private set; }
 
-    public List<int> Params;
+        public int TalentID{ get;private set; }
 
-    public void Parse(string data)
-    {
+        public List<int> mParams;
+
+        public Dictionary<string,float> mAttribute;
+
+        public Vector3 mPos;
+
+        public Color mOldCol;
+
+        public void Parse(string data)
+        {
         
+        }
     }
 }

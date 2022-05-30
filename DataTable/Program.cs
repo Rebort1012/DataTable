@@ -10,13 +10,15 @@ namespace DataTable
     {
         static void Main(string[] args)
         {
-            Config config = new Config();
-
 
             ExcelTool excelTool = new ExcelTool();
-            excelTool.autoClass.AutoSaveClass("./Excel/Hero.xlsx", config.classPath);
+
+            excelTool.CreateDataTable("./Excel/Hero.xlsx");
+
+            //excelTool.Test("./Excel/Hero.xlsx");
 
 
+            Logger.Log("Press Any Key Out:");
             Console.ReadKey();
         }
     }

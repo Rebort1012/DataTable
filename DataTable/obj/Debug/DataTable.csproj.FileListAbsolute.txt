@@ -9,3 +9,14 @@ E:\DataTable\DataTable\obj\Debug\DataTable.csproj.CopyComplete
 E:\DataTable\DataTable\obj\Debug\DataTable.exe
 E:\DataTable\DataTable\obj\Debug\DataTable.pdb
 E:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\DataTable\DataTable\bin\Debug\DataTable.exe.config
+D:\DataTable\DataTable\bin\Debug\DataTable.exe
+D:\DataTable\DataTable\bin\Debug\DataTable.pdb
+D:\DataTable\DataTable\bin\Debug\Excel.dll
+D:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.dll
+D:\DataTable\DataTable\obj\Debug\DataTable.csproj.AssemblyReference.cache
+D:\DataTable\DataTable\obj\Debug\DataTable.csproj.SuggestedBindingRedirects.cache
+D:\DataTable\DataTable\obj\Debug\DataTable.csproj.CoreCompileInputs.cache
+D:\DataTable\DataTable\obj\Debug\DataTable.csproj.CopyComplete
+D:\DataTable\DataTable\obj\Debug\DataTable.exe
+D:\DataTable\DataTable\obj\Debug\DataTable.pdb
