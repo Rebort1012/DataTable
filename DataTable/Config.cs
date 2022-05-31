@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -48,6 +49,9 @@ namespace DataTable
 
             for (int i = 0; i < strs.Length; ++i)
             {
+                if (strs[i].StartsWith("#"))
+                    continue;
+
                 string[] tempStrs = strs[i].Split(':');
 
                 string name = Regex.Replace(tempStrs[0], "[^A-Za-z0-9]", "");
@@ -60,7 +64,6 @@ namespace DataTable
                     case "exportType": exportType = (ExportType)Enum.Parse(typeof(ExportType), tempStrs[1]); break;
                     case "isExportServer": isExportServer = tempStrs[1].ToLower() != "false"; break;
                 }
-
             }
         }
     }

@@ -32,15 +32,23 @@ namespace DataTable
             int tableNum = result.Tables.Count;
             for (int index = 0; index < tableNum; index++)
             {
-                if (result.Tables[index].TableName.ToLower().Contains("sheet"))
-                    continue;
-
+                string className = "";
+                if (tableNum > 1)
+                {
+                    if (result.Tables[index].TableName.ToLower().Contains("sheet"))
+                        continue;
+                    className = result.Tables[index].TableName;
+                }
+                else
+                {
+                    string[] tempS11 = path.Split('/');
+                    className = tempS11[tempS11.Length - 1].Split('.')[0];
+                }
                 int columns = result.Tables[index].Columns.Count;
                 int rows = result.Tables[index].Rows.Count;
 
                 //TODO:单个sheet====0
                 //sheet名 = 类名
-                string className = result.Tables[index].TableName;
                 string tempVal = classStr;
                 tempVal = tempVal.Replace("className", className);
 
@@ -69,26 +77,60 @@ namespace DataTable
                     string kv_key = "";
 
 
-                    for (int j = 0; j < 7; ++j)
+                    for (int j = 0; j < 3; ++j)
                     {
                         string tempRow0 = result.Tables[index].Rows[j][0].ToString();
 
-                        if (tempRow0 == "#")
+                        if (tempRow0.StartsWith("#"))
                             continue;
-                        else if (tempRow0 == "type")
+                        else if (tempRow0.ToLower() == "type")
+                        {
                             dataType = result.Tables[index].Rows[j][i].ToString();
-                        else if (tempRow0 == "name")
+                            if (dataType.EndsWith("[]"))
+                            {
+                                add = dataType.Split('[')[0];
+                                dataType = "array";
+                            }
+                            else if (dataType.StartsWith("dic"))
+                            {
+                                dataType = dataType.Substring(0, dataType.Length - 1);
+                                add = dataType.Split('<')[1];
+                                dataType = "dic";
+                            }
+                            else if (dataType.StartsWith("enum"))
+                            {
+                                add = "";
+                                int enumCount = 1;
+                                for (int k = 4; k < rows; ++k)
+                                {
+                                    string strenum = result.Tables[index].Rows[k][i].ToString();
+                                    if (!add.Contains(strenum))
+                                    {
+                                        add += $"{strenum}:{enumCount},";
+                                        enumCount++;
+                                    }
+                                }
+                                add = add.Substring(0, add.Length - 1);
+                            }
+                        }
+                        else if (tempRow0.ToLower() == "name")
+                        {
                             dataName = UpperFirstLetter(result.Tables[index].Rows[j][i].ToString());
-                        else if (tempRow0 == "add")
-                            add = result.Tables[index].Rows[j][i].ToString();
-                        else if (tempRow0 == "kv_key")
-                            kv_key = result.Tables[index].Rows[j][i].ToString();
+                            if (dataType == "dic")
+                            {
+                                string[] tempStr3 = dataName.Split(':');
+                                dataName = tempStr3[0];
+                                kv_key = tempStr3[1];
+                            }
+                        }
                         else if (tempRow0 == "")
                         {
                             if (startIndex == 0)
                                 startIndex = j;
                             continue;
                         }
+
+
                     }
 
                     if (dataType == "enum")
@@ -99,9 +141,8 @@ namespace DataTable
                         foreach (string tempStr in strstemp1)
                         {
                             string[] strstemp2 = tempStr.Split(':');
-                            tempStrs.Add(strstemp2[1], int.Parse(strstemp2[0]));
+                            tempStrs.Add(strstemp2[0], int.Parse(strstemp2[1]));
                         }
-
                         enumDic.Add(dataName, tempStrs);
 
                         string tempEnumStr = enumStr.Replace("Type", dataName);
@@ -214,7 +255,7 @@ ErrorType:{dataType}
                 FileTool.WriteString($"{classPath}{className}.cs", tempVal);
 
 
-                for (int i = startIndex; i < rows; ++i)
+                for (int i = 3; i < rows; ++i)
                 {
                     Dictionary<string, bool> dicAddedDic = new Dictionary<string, bool>();
                     foreach (var it in dicTypeDic)
@@ -222,9 +263,17 @@ ErrorType:{dataType}
                         dicAddedDic[it.Key] = false;
                     }
 
-                    for (int j = 2; j < columns; ++j)
+                    for (int j = 1; j < columns; ++j)
                     {
-                        AddData(result.Tables[index].Rows[i][j].ToString(), dataNameDic[j], dataTypeDic[j], enumDic, arrayDic, dicDic, dicTypeDic, dicAddedDic);
+                        try
+                        {
+                            AddData(result.Tables[index].Rows[i][j].ToString(), dataNameDic[j], dataTypeDic[j], enumDic, arrayDic, dicDic, dicTypeDic, dicAddedDic);
+                        }
+                        catch
+                        {
+                            Logger.Error($@"Path:{path}
+Line:Rows--{i}Columns--{j}");
+                        }
                     }
 
                     dataStr = dataStr.Substring(0, dataStr.Length - 1);
@@ -232,6 +281,7 @@ ErrorType:{dataType}
                 }
 
                 SaveData(dataStr, className);
+                Logger.Log($"{className}.cs Created");
             }
         }
 
@@ -288,9 +338,9 @@ namespace Dadabase
         public void Test(string path)
         {
             DataSet result = OpenExcel(path);
-            Logger.Log(result.Tables[0].Rows[0][13].ToString());
-            Logger.Log(result.Tables[0].Rows[0][14].ToString());
-            Logger.Log(result.Tables[0].Rows[0][15].ToString());
+            Logger.Log(result.Tables[0].Rows[2][4].ToString());
+            Logger.Log(result.Tables[0].Rows[3][4].ToString());
+            Logger.Log(result.Tables[0].Rows[4][4].ToString());
         }
 
         private void AddData(string data, string name, string type, Dictionary<string, Dictionary<string, int>> enumDic, Dictionary<string, bool> arrayDic, Dictionary<string, List<string>> dicDic, Dictionary<string, bool> dicTypeDic, Dictionary<string, bool> dicAddedDic)
@@ -304,7 +354,7 @@ namespace Dadabase
         }
 
         private void AddJsonData(string data, string name, string type, Dictionary<string, Dictionary<string, int>> enumDic, Dictionary<string, bool> arrayDic, Dictionary<string, List<string>> dicDic, Dictionary<string, bool> dicTypeDic, Dictionary<string, bool> dicAddedDic)
-        {           
+        {
             if (type == "int" || type == "float" || type == "bool")
             {
                 if (type == "bool")
@@ -412,7 +462,7 @@ namespace Dadabase
             {
                 case Config.ExportType.Json:
                     dataStr = "[{" + dataStr.Substring(0, dataStr.Length - 2) + "]";
-                    FileTool.WriteString($"{Config.I.dataPath}{className}.json", dataStr);
+                    FileTool.WriteString($"{Config.I.dataPath}/Json/{className}.json", dataStr);
                     break;
                 case Config.ExportType.Bytes: FileTool.WriteString($"{Config.I.dataPath}{className}", dataStr); break;
                 case Config.ExportType.Protobuf: FileTool.WriteString($"{Config.I.dataPath}{className}.proto", dataStr); break;

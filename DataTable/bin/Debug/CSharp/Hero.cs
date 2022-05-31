@@ -39,14 +39,6 @@ namespace Dadabase
 
         public int TalentID{ get;private set; }
 
-        public List<int> mParams;
-
-        public Dictionary<string,float> mAttribute;
-
-        public Vector3 mPos;
-
-        public Color mOldCol;
-
         public void Parse(string data)
         {
         

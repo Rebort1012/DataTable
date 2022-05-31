@@ -11,11 +11,17 @@ namespace DataTable
         static void Main(string[] args)
         {
             ExcelTool excelTool = new ExcelTool();
-            excelTool.CreateDataTable("./Excel/Hero.xlsx");
 
-            //excelTool.Test("./Excel/Hero.xlsx");
+            FileTool fileTool = new FileTool();
+            fileTool.GetAllFiles(Config.I.excelPath);
 
-            Logger.Log("Press Any Key Out!");
+            foreach (var item in fileTool.fileList)
+            {
+                if (item.Contains(".xls"))
+                    excelTool.CreateDataTable(item);
+            }
+
+            Logger.Log("Press Any Key Exit!");
             Console.ReadKey();
         }
     }
