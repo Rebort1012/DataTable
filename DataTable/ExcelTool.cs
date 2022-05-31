@@ -262,6 +262,9 @@ ErrorType:{dataType}
 
                 for (int i = 3; i < rows; ++i)
                 {
+                    if (result.Tables[index].Rows[i][0].ToString() != "")
+                        continue;
+
                     Dictionary<string, bool> dicAddedDic = new Dictionary<string, bool>();
                     foreach (var it in dicTypeDic)
                     {
@@ -280,6 +283,7 @@ ErrorType:{dataType}
 Line:Rows--{i}Columns--{j}");
                         }
                     }
+                    Logger.LogCls($"Rows:{i}");
 
                     dataStr = dataStr.Substring(0, dataStr.Length - 1);
                     dataStr += "},{";

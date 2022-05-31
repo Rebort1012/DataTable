@@ -58,3 +58,14 @@ isExportServer:False
 
 - 枚举：自动生成的枚举类型从1开始，Enum类型为：Enum+变量名字段；
 
+## 序列化
+
+LitJson库魔改；
+
+将example/Csharp/中
+
+JsonExtension.cs
+
+UnityTypeBridge.cs
+
+导入工程，对自定义类型(Vector,color)注册；
