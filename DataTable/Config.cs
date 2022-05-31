@@ -41,6 +41,8 @@ namespace DataTable
         public ExportType exportType;
         public bool isExportServer;
 
+        public List<string> enumTypeList = new List<string>();
+
         private void LoadConfig()
         {
             configPath = "./config.txt";
@@ -65,6 +67,8 @@ namespace DataTable
                     case "isExportServer": isExportServer = tempStrs[1].ToLower() != "false"; break;
                 }
             }
+
+            FileTool.WriteString($"{classPath}EnumType.cs", "");
         }
     }
 }

@@ -129,8 +129,6 @@ namespace DataTable
                                 startIndex = j;
                             continue;
                         }
-
-
                     }
 
                     if (dataType == "enum")
@@ -154,10 +152,17 @@ namespace DataTable
                         }
                         tempEnumStr += @"        }
 ";
-                        tempVal += tempEnumStr;
+                        //tempVal += tempEnumStr;
+
+                        if (!Config.I.enumTypeList.Contains(dataName))
+                        {
+                            Config.I.enumTypeList.Add(dataName);
+                            tempEnumStr = FileTool.ReadString($"{classPath}EnumType.cs") + tempEnumStr;
+                            FileTool.WriteString($"{classPath}EnumType.cs", tempEnumStr);
+                        }
 
                         string enumStr2 = @"
-        public dataType mdataName;
+        public dataType dataName{ get; private set; }
 ";
                         enumStr2 = enumStr2.Replace("dataType", "Enum" + dataName);
                         enumStr2 = enumStr2.Replace("dataName", dataName);
@@ -167,7 +172,7 @@ namespace DataTable
                     else if (dataType == "array")
                     {
                         string arrStr = @"
-        public List<Type> marrName;
+        public List<Type> arrName{ get; private set; }
 ";
                         arrStr = arrStr.Replace("Type", add);
                         arrStr = arrStr.Replace("arrName", dataName);
@@ -190,7 +195,7 @@ namespace DataTable
                             continue;
                         }
                         string dicStr = @"
-        public Dictionary<key,value> mdicName;
+        public Dictionary<key,value> dicName{ get; private set; }
 ";
                         string[] str1s = add.ToString().Split(',');
                         dicStr = dicStr.Replace("key", str1s[0]);
@@ -205,7 +210,7 @@ namespace DataTable
                     else if (dataType.ToLower() == "vector3")
                     {
                         string vecStr = @"
-        public Vector3 mname;
+        public Vector3 name{ get; private set; }
 ";
                         vecStr = vecStr.Replace("name", dataName);
                         tempVal += vecStr;
@@ -213,7 +218,7 @@ namespace DataTable
                     else if (dataType.ToLower() == "vector2")
                     {
                         string vecStr = @"
-        public Vector2 mname;
+        public Vector2 name{ get; private set; }
 ";
                         vecStr = vecStr.Replace("name", dataName);
                         tempVal += vecStr;
@@ -221,7 +226,7 @@ namespace DataTable
                     else if (dataType.ToLower() == "color")
                     {
                         string colorStr = @"
-        public Color mname;
+        public Color name{ get; private set; }
 ";
                         colorStr = colorStr.Replace("name", dataName);
                         tempVal += colorStr;
@@ -322,6 +327,15 @@ namespace Dadabase
             return Regex.Replace(value, @"\b(\w)|\s(\w)", match =>
             {
                 return match.Value.ToUpper();
+            });
+        }
+
+        private string LowerFirstLetter(string value)
+        {
+            //开头是一个字母或者空格后的第一个字母
+            return Regex.Replace(value, @"\b(\w)|\s(\w)", match =>
+            {
+                return match.Value.ToLower();
             });
         }
 

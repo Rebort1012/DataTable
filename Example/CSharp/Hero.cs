@@ -14,14 +14,7 @@ namespace Dadabase
 
         public string PerfabName{ get;private set; }
 
-        public enum EnumJob
-        {
-            Sword,
-            Magic,
-            Bow,
-        }
-
-        public EnumJob mJob;
+        public EnumJob Job{ get; private set; }
 
         public int Icon{ get;private set; }
 
