@@ -10,7 +10,7 @@
 - 支持枚举
 - 支持unity类型vector3,vector2,color
 - 自动生成csharp类
-- 单个excel中多个sheet，依次导出 <color=red>sheet名为生成C#类的class名</color>
+- 单个excel中多个sheet，依次导出 <font color=red>sheet名为生成C#类的class名</color>
 
 ## 使用
 
