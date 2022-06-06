@@ -11,15 +11,7 @@ namespace DataTable
     internal class Config
     {
         private static Config instance;
-        public static Config I
-        {
-            get
-            {
-                if (instance == null)
-                    instance = new Config();
-                return instance;
-            }
-        }
+        public static Config I => instance ?? (instance = new Config());
 
         private Config()
         {
@@ -34,14 +26,14 @@ namespace DataTable
             Bytes,
         }
 
-        public string configPath;
+        private string configPath;
         public string excelPath;
         public string dataPath;
         public string classPath;
         public ExportType exportType;
         public bool isExportServer;
 
-        public List<string> enumTypeList = new List<string>();
+        public readonly List<string> enumTypeList = new List<string>();
 
         private void LoadConfig()
         {

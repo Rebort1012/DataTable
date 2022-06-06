@@ -6,7 +6,7 @@ namespace DataTable
 {
     internal class FileTool
     {
-        public List<string> fileList = new List<string>();
+        public readonly List<string> fileList = new List<string>();
         public void GetAllFiles(string path)
         {
             if (!Directory.Exists(path))
@@ -70,7 +70,5 @@ namespace DataTable
                 writer.Flush();
             }
         }
-
-
     }
 }

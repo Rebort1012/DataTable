@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataTable
 {
-    internal class Logger
+    internal static class Logger
     {
         public static void Log(Object value)
         {
@@ -23,7 +23,6 @@ namespace DataTable
         public static void LogCls(Object value)
         {
             Console.SetCursorPosition(0, Console.CursorTop);
-            //Console.Write(new String(' ', Console.BufferWidth));
             Console.Write(value.ToString() + " ", Console.BufferWidth);
         }
     }
