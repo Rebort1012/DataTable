@@ -12,7 +12,6 @@ D:\DataTable\DataTable\obj\Debug\DataTable.pdb
 E:\DataTable\DataTable\bin\Debug\DataTable.exe.config
 E:\DataTable\DataTable\bin\Debug\DataTable.exe
 E:\DataTable\DataTable\bin\Debug\DataTable.pdb
-E:\DataTable\DataTable\bin\Debug\Excel.dll
 E:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.dll
 E:\DataTable\DataTable\obj\Debug\DataTable.csproj.AssemblyReference.cache
 E:\DataTable\DataTable\obj\Debug\DataTable.csproj.SuggestedBindingRedirects.cache

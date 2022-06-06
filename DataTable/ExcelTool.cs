@@ -66,7 +66,7 @@ namespace PerillaTable
                     string dataName = "";
                     string add = "";
 
-                    for (int j = 2; j < 4; ++j)
+                    for (int j = 1; j < 3; ++j)
                     {
                         string tempRow0 = curSheet.Rows[j][0].ToString();
                         switch (tempRow0.ToLower())
@@ -173,8 +173,6 @@ namespace PerillaTable
                             arrStr = arrStr.Replace("Type", add);
                             arrStr = arrStr.Replace("arrName", dataName);
                             cshapClassStr += arrStr;
-
-
                             break;
                         case "dic":
                             {
@@ -184,7 +182,7 @@ namespace PerillaTable
                                 string[] str1s = add.ToString().Split(',');
                                 dicStr = dicStr.Replace("key", str1s[0]);
                                 dicStr = dicStr.Replace("value", str1s[1]);
-                                dicStr = dicStr.Replace("dicName", dataName);
+                                dicStr = dicStr.Replace("dicName", dataName.Split(':')[0]);
 
                                 if (!cshapClassStr.Contains(dicStr))
                                     cshapClassStr += dicStr;
@@ -247,14 +245,14 @@ ErrorType:{dataType}
 
                 #region 生成数据文件
                 string rowData = "";
-                for (int i = 4; i < rows; ++i)
+                for (int i = 3; i < rows; ++i)
                 {
                     if (curSheet.Rows[i][0].ToString() != "")
                         continue;
 
                     for (int j = 1; j < columns; ++j)
                     {
-                        rowData += $"{curSheet.Rows[2][j]}{split01}{curSheet.Rows[3][j]}{split01}{curSheet.Rows[i][j]}{split02}";
+                        rowData += $"{curSheet.Rows[2][j]}{split01}{curSheet.Rows[1][j]}{split01}{curSheet.Rows[i][j]}{split02}";
                     }
                     rowData = rowData.Substring(0, rowData.Length - 1);
                     rowData += split03;
@@ -270,7 +268,7 @@ ErrorType:{dataType}
                     {
                         Dictionary<string, int> enumTemp = new Dictionary<string, int>();
                         int count = 0;
-                        for (int k = 4; k < rows; ++k)
+                        for (int k = 3; k < rows; ++k)
                         {
                             if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
                             {
@@ -279,7 +277,7 @@ ErrorType:{dataType}
                             }
                         }
 
-                        enumTypesDic.Add(curSheet.Rows[3][j].ToString(), enumTemp);
+                        enumTypesDic.Add(curSheet.Rows[1][j].ToString(), enumTemp);
                     }
                 }
 
@@ -290,6 +288,7 @@ ErrorType:{dataType}
             }
         }
 
+        //自定义c#类
         private void InitClassStr()
         {
             classStr = @"using System;
@@ -355,7 +354,7 @@ namespace Database
                         continue;
 
                     DataTable data = new DataTable();
-                    IRow firstRow = sheet.GetRow(0);
+                    IRow firstRow = sheet.GetRow(1);
                     int cellCount = firstRow.LastCellNum; //一行最后一个cell的编号 即总的列数
 
                     for (int j = firstRow.FirstCellNum; j < cellCount; ++j)

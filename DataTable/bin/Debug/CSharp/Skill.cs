@@ -34,8 +34,6 @@ namespace Database
 
         public string BuffType{ get;private set; }
 
-        public string BuffPerfab{ get;private set; }
-
         public float BuffRatio{ get;private set; }
 
         public float BuffDamage{ get;private set; }
