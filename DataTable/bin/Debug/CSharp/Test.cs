@@ -7,6 +7,7 @@ namespace Database
     [Serializable]
     public class Test
     {
+
         public int Id{ get;private set; }
 
         public float Hp{ get;private set; }

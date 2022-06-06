@@ -4,21 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataTable
+namespace PerillaTable
 {
     static class Program
     {
         static void Main(string[] args)
         {
-            Logger.Log(ExcelTool.OpenExcel("./Excel/Skill.xlsx").Tables[0].Rows[12][10].ToString());
-            Logger.Log(ExcelTool.OpenExcel("./Excel/Skill.xlsx").Tables[0].Rows[12][9].ToString());
-            Logger.Log(ExcelTool.OpenExcel("./Excel/Skill.xlsx").Tables[0].Rows[12][11].ToString());
-            Logger.Log(ExcelTool.OpenExcel("./Excel/Skill.xlsx").Tables[0].Rows[13][10].ToString());
-            Logger.Log(ExcelTool.OpenExcel("./Excel/Skill.xlsx").Tables[0].Rows[12][8].ToString());
-
-            Console.ReadKey();
-            return;
-
             DateTime time = DateTime.Now.ToUniversalTime();
 
             ExcelTool excelTool = new ExcelTool();
@@ -36,9 +27,6 @@ namespace DataTable
             Logger.Log("TotalSeconds:" + (DateTime.Now.ToUniversalTime() - time).TotalSeconds);
             Logger.Log("Press Any Key Exit!");
             Console.ReadKey();
-
-
-
         }
     }
 }

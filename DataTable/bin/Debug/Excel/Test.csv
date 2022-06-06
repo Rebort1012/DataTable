@@ -1,7 +1,0 @@
-﻿#注释,,,,,数组,,kv表,,,,向量,颜色,枚举
-type,int,float,string,bool,int[],string[],"dic<string,float>","dic<string,float>","dic<string,float>","dic<string,float>",vector3,color,enum
-name,id,hp,name,isHero,params,descrip,Attribute:atk,Attribute:def,Attribute:spd,Attribute:miss,pos,oldCol,job
-,1,2.3,bab,FALSE,"1,1,1,1","aaa,bbb,cc,d",123,3,4,5,"1,3,4","1,1,1,1",Sword
-,2,22.01,egz,FALSE,"1,1,1,2","aaa,bbb,cc,d",21,3,4,5,"1,3,4","1,1,1,1",Bow
-,3,44.44,aad,TRUE,"1,1,1,3","aaa,bbb,cc,d",55,3,4,5,"1,3,4","1,1,1,1",Magic
-,4,9.33,hvz,FALSE,"1,1,1,4","aaa,bbb,cc,d",31,3,4,5,"1,3.3,4","1,1,0.22,1",Sword

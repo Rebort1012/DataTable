@@ -8,6 +8,8 @@ namespace Database
     public class Skill
     {
 
+        public int SkillId{ get;private set; }
+
         public string SkillName{ get;private set; }
 
         public string Describe{ get;private set; }

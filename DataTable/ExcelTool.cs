@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text.RegularExpressions;
-using Excel;
+using NPOI.HSSF.UserModel;
+using NPOI.SS.UserModel;
+using NPOI.XSSF.UserModel;
 
-
-namespace DataTable
+namespace PerillaTable
 {
     class ExcelTool
     {
@@ -28,18 +29,16 @@ namespace DataTable
         public void CreateDataTable(string path)
         {
             string classPath = Config.I.classPath;
-            DataSet result = OpenExcel(path);
+            List<DataTable> result = ExcelToDataTable(path);
 
-            int tableNum = result.Tables.Count;
+            int tableNum = result.Count;
             for (int index = 0; index < tableNum; index++)
             {
-                System.Data.DataTable curSheet = result.Tables[index];
+                DataTable curSheet = result[index];
 
                 //excel中包含多个sheet,sheet名为类型，忽略sheet名中包含"sheet"的表单;
                 if (tableNum > 1)
-                {
-                    if (curSheet.TableName.ToLower().Contains("sheet"))
-                        continue;
+                {      
                     className = curSheet.TableName;
                 }
                 //只有一个sheet的excel文件，文件名为类名;
@@ -67,15 +66,12 @@ namespace DataTable
                     string dataName = "";
                     string add = "";
 
-                    for (int j = 0; j < 3; ++j)
+                    for (int j = 2; j < 4; ++j)
                     {
                         string tempRow0 = curSheet.Rows[j][0].ToString();
-
-                        if (tempRow0.StartsWith("#"))
-                            continue;
                         switch (tempRow0.ToLower())
                         {
-                            case "type":
+                            case "#type":
                                 {
                                     dataType = curSheet.Rows[j][i].ToString();
                                     if (dataType.EndsWith("[]"))
@@ -107,7 +103,7 @@ namespace DataTable
 
                                     break;
                                 }
-                            case "name":
+                            case "#name":
                                 {
                                     dataName = UpperFirstLetter(curSheet.Rows[j][i].ToString());
                                     if (dataType == "dic")
@@ -251,14 +247,14 @@ ErrorType:{dataType}
 
                 #region 生成数据文件
                 string rowData = "";
-                for (int i = 3; i < rows; ++i)
+                for (int i = 4; i < rows; ++i)
                 {
                     if (curSheet.Rows[i][0].ToString() != "")
                         continue;
 
                     for (int j = 1; j < columns; ++j)
                     {
-                        rowData += $"{curSheet.Rows[1][j]}{split01}{curSheet.Rows[2][j]}{split01}{curSheet.Rows[i][j]}{split02}";
+                        rowData += $"{curSheet.Rows[2][j]}{split01}{curSheet.Rows[3][j]}{split01}{curSheet.Rows[i][j]}{split02}";
                     }
                     rowData = rowData.Substring(0, rowData.Length - 1);
                     rowData += split03;
@@ -270,11 +266,11 @@ ErrorType:{dataType}
 
                 for (int j = 1; j < columns; ++j)
                 {
-                    if (curSheet.Rows[1][j].ToString() == "enum")
+                    if (curSheet.Rows[2][j].ToString() == "enum")
                     {
                         Dictionary<string, int> enumTemp = new Dictionary<string, int>();
                         int count = 0;
-                        for (int k = 3; k < rows; ++k)
+                        for (int k = 4; k < rows; ++k)
                         {
                             if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
                             {
@@ -283,12 +279,11 @@ ErrorType:{dataType}
                             }
                         }
 
-                        enumTypesDic.Add(curSheet.Rows[2][j].ToString(), enumTemp);
+                        enumTypesDic.Add(curSheet.Rows[3][j].ToString(), enumTemp);
                     }
                 }
 
                 CreateData(rowData, enumTypesDic);
-
 
                 Logger.Log($"{className}.cs Created");
                 #endregion
@@ -338,13 +333,72 @@ namespace Database
             return Regex.Replace(value, @"\b(\w)|\s(\w)", match => match.Value.ToLower());
         }
 
-        public static DataSet OpenExcel(string path)
+        public static List<DataTable> ExcelToDataTable(string fileName)
         {
-            using (FileStream fileStream = File.Open(path, FileMode.Open, FileAccess.Read))
+            IWorkbook workbook = null;
+            ISheet sheet = null;
+
+            List<DataTable> dataList = new List<DataTable>();
+            int startRow = 0;
+            try
             {
-                IExcelDataReader excelDataReader = ExcelReaderFactory.CreateOpenXmlReader(fileStream);
-                DataSet result = excelDataReader.AsDataSet();
-                return result;
+                var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+                if (fileName.IndexOf(".xlsx") > 0) // 2007版本
+                    workbook = new XSSFWorkbook(fs);
+                else if (fileName.IndexOf(".xls") > 0) // 2003版本
+                    workbook = new HSSFWorkbook(fs);
+
+                for (int i = 0; i < workbook.NumberOfSheets; ++i)
+                {
+                    sheet = workbook.GetSheetAt(i);
+                    if (sheet.SheetName.ToLower().Contains("sheet") && workbook.NumberOfSheets != 1)
+                        continue;
+
+                    DataTable data = new DataTable();
+                    IRow firstRow = sheet.GetRow(0);
+                    int cellCount = firstRow.LastCellNum; //一行最后一个cell的编号 即总的列数
+
+                    for (int j = firstRow.FirstCellNum; j < cellCount; ++j)
+                    {
+                        ICell cell = firstRow.GetCell(j);
+                        if (cell != null)
+                        {
+                            string cellValue = cell.StringCellValue;
+                            if (cellValue != null)
+                            {
+                                DataColumn column = new DataColumn(cellValue);
+                                data.Columns.Add(column);
+                            }
+                        }
+                    }
+
+
+                    startRow = sheet.FirstRowNum;
+
+                    //最后一列的标号
+                    int rowCount = sheet.LastRowNum;
+                    for (int j = startRow; j <= rowCount; ++j)
+                    {
+                        IRow row = sheet.GetRow(j);
+                        if (row == null) continue; //没有数据的行默认是null　　　　　　　
+                        DataRow dataRow = data.NewRow();
+                        for (int k = row.FirstCellNum; k < cellCount; ++k)
+                        {
+                            if (row.GetCell(k) != null) //同理，没有数据的单元格都默认是null
+                                dataRow[k] = row.GetCell(k).ToString();
+                        }
+                        data.Rows.Add(dataRow);
+                    }
+
+                    dataList.Add(data);
+                }
+
+                return dataList;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception: " + ex.Message);
+                return null;
             }
         }
 
@@ -359,7 +413,6 @@ namespace Database
                 case Config.ExportType.Protobuf: FileTool.WriteString($"{Config.I.dataPath}{className}.proto", dataStr); break;
             }
         }
-
 
         private void CreateData(string data, Dictionary<string, Dictionary<string, int>> enumTypesDic)
         {
