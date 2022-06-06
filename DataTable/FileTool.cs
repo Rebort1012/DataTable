@@ -4,7 +4,7 @@ using System.IO;
 
 namespace DataTable
 {
-    internal class FileTool
+    class FileTool
     {
         public readonly List<string> fileList = new List<string>();
         public void GetAllFiles(string path)

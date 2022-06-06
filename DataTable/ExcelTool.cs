@@ -8,7 +8,7 @@ using Excel;
 
 namespace DataTable
 {
-    internal class ExcelTool
+    class ExcelTool
     {
         public ExcelTool()
         {
@@ -19,10 +19,12 @@ namespace DataTable
         private string propertyStr;
         private string parseStr;
         private string enumStr;
-        
-        private string dataStr;
-        private int dicIndex = 0;
 
+        private const char split01 = '-';
+        private const char split02 = ';';
+        private const char split03 = '}';
+
+        string className = "";
         public void CreateDataTable(string path)
         {
             string classPath = Config.I.classPath;
@@ -31,285 +33,265 @@ namespace DataTable
             int tableNum = result.Tables.Count;
             for (int index = 0; index < tableNum; index++)
             {
-                string className = "";
+                System.Data.DataTable curSheet = result.Tables[index];
+
+                //excel中包含多个sheet,sheet名为类型，忽略sheet名中包含"sheet"的表单;
                 if (tableNum > 1)
                 {
-                    if (result.Tables[index].TableName.ToLower().Contains("sheet"))
+                    if (curSheet.TableName.ToLower().Contains("sheet"))
                         continue;
-                    className = result.Tables[index].TableName;
+                    className = curSheet.TableName;
                 }
+                //只有一个sheet的excel文件，文件名为类名;
                 else
                 {
                     string[] tempS11 = path.Split('/');
                     className = tempS11[tempS11.Length - 1].Split('.')[0];
                 }
-                int columns = result.Tables[index].Columns.Count;
-                int rows = result.Tables[index].Rows.Count;
-                
+
+                int columns = curSheet.Columns.Count;
+                int rows = curSheet.Rows.Count;
+
                 //sheet名 = 类名
-                string tempVal = classStr;
-                tempVal = tempVal.Replace("className", className);
+                string cshapClassStr = classStr;
+                cshapClassStr = cshapClassStr.Replace("className", className);
 
-                //正式数据起点行
-                int startIndex = 0;
-
-                dataStr = "";
-                //List<string> addDic = new List<string>();
-
-                Dictionary<int, string> dataNameDic = new Dictionary<int, string>();
-                Dictionary<int, string> dataTypeDic = new Dictionary<int, string>();
-                //枚举类型记录
-                Dictionary<string, Dictionary<string, int>> enumDic = new Dictionary<string, Dictionary<string, int>>();
-                //数组类型是不是字符串
-                Dictionary<string, bool> arrayDic = new Dictionary<string, bool>();
-
-                Dictionary<string, List<string>> dicDic = new Dictionary<string, List<string>>();
-                Dictionary<string, bool> dicTypeDic = new Dictionary<string, bool>();
-
+                #region 生成C#类
                 //第一行类型
-                for (int i = 1; i < columns; ++i)
+                for (int i = 0; i < columns; ++i)
                 {
+                    if (curSheet.Rows[0][i].ToString().StartsWith("#"))
+                        continue;
+
                     string dataType = "";
                     string dataName = "";
                     string add = "";
-                    string kv_key = "";
-
 
                     for (int j = 0; j < 3; ++j)
                     {
-                        string tempRow0 = result.Tables[index].Rows[j][0].ToString();
+                        string tempRow0 = curSheet.Rows[j][0].ToString();
 
                         if (tempRow0.StartsWith("#"))
                             continue;
                         switch (tempRow0.ToLower())
                         {
                             case "type":
-                            {
-                                dataType = result.Tables[index].Rows[j][i].ToString();
-                                if (dataType.EndsWith("[]"))
                                 {
-                                    add = dataType.Split('[')[0];
-                                    dataType = "array";
-                                }
-                                else if (dataType.StartsWith("dic"))
-                                {
-                                    dataType = dataType.Substring(0, dataType.Length - 1);
-                                    add = dataType.Split('<')[1];
-                                    dataType = "dic";
-                                }
-                                else if (dataType.StartsWith("enum"))
-                                {
-                                    add = "";
-                                    int enumCount = 1;
-                                    for (int k = 4; k < rows; ++k)
+                                    dataType = curSheet.Rows[j][i].ToString();
+                                    if (dataType.EndsWith("[]"))
                                     {
-                                        string strenum = result.Tables[index].Rows[k][i].ToString();
-                                        if (!add.Contains(strenum))
-                                        {
-                                            add += $"{strenum}:{enumCount},";
-                                            enumCount++;
-                                        }
+                                        add = dataType.Split('[')[0];
+                                        dataType = "array";
                                     }
-                                    add = add.Substring(0, add.Length - 1);
-                                }
+                                    else if (dataType.StartsWith("dic"))
+                                    {
+                                        dataType = dataType.Substring(0, dataType.Length - 1);
+                                        add = dataType.Split('<')[1];
+                                        dataType = "dic";
+                                    }
+                                    else if (dataType.StartsWith("enum"))
+                                    {
+                                        add = "";
+                                        int enumCount = 0;
+                                        for (int k = 4; k < rows; ++k)
+                                        {
+                                            string strenum = curSheet.Rows[k][i].ToString();
+                                            if (!add.Contains(strenum))
+                                            {
+                                                add += $"{strenum}:{enumCount},";
+                                                enumCount++;
+                                            }
+                                        }
+                                        add = add.Substring(0, add.Length - 1);
+                                    }
 
-                                break;
-                            }
+                                    break;
+                                }
                             case "name":
-                            {
-                                dataName = UpperFirstLetter(result.Tables[index].Rows[j][i].ToString());
-                                if (dataType == "dic")
                                 {
-                                    string[] tempStr3 = dataName.Split(':');
-                                    dataName = tempStr3[0];
-                                    kv_key = tempStr3[1];
-                                }
+                                    dataName = UpperFirstLetter(curSheet.Rows[j][i].ToString());
+                                    if (dataType == "dic")
+                                    {
+                                        string[] tempStr3 = dataName.Split(':');
+                                        dataName = tempStr3[0];
+                                    }
 
-                                break;
-                            }
+                                    break;
+                                }
                             default:
-                            {
-                                if (tempRow0 == "")
                                 {
-                                    if (startIndex == 0)
-                                        startIndex = j;
-                                    continue;
+                                    if (tempRow0 == "")
+                                    {
+                                        continue;
+                                    }
+                                    break;
                                 }
-
-                                break;
-                            }
                         }
                     }
 
                     switch (dataType)
                     {
                         case "enum":
-                        {
-                            Dictionary<string, int> tempStrs = new Dictionary<string, int>();
-
-                            string[] strstemp1 = add.Split(',');
-                            foreach (string tempStr in strstemp1)
                             {
-                                string[] strstemp2 = tempStr.Split(':');
-                                tempStrs.Add(strstemp2[0], int.Parse(strstemp2[1]));
-                            }
-                            enumDic.Add(dataName, tempStrs);
+                                Dictionary<string, int> tempStrs = new Dictionary<string, int>();
 
-                            string tempEnumStr = enumStr.Replace("Type", dataName);
+                                string[] strstemp1 = add.Split(',');
+                                foreach (string tempStr in strstemp1)
+                                {
+                                    string[] strstemp2 = tempStr.Split(':');
+                                    tempStrs.Add(strstemp2[0], int.Parse(strstemp2[1]));
+                                }
 
-                            foreach (var it in tempStrs)
-                            {
-                                tempEnumStr += $@"            {UpperFirstLetter(it.Key)},
+
+                                string tempEnumStr = enumStr.Replace("Type", dataName);
+
+                                foreach (var it in tempStrs)
+                                {
+                                    tempEnumStr += $@"            {UpperFirstLetter(it.Key)},
 ";
-                            }
-                            tempEnumStr += @"        }
+                                }
+                                tempEnumStr += @"        }
 ";
-                            //tempVal += tempEnumStr;
 
-                            if (!Config.I.enumTypeList.Contains(dataName))
-                            {
-                                Config.I.enumTypeList.Add(dataName);
-                                tempEnumStr = FileTool.ReadString($"{classPath}EnumType.cs") + tempEnumStr;
-                                FileTool.WriteString($"{classPath}EnumType.cs", tempEnumStr);
-                            }
+                                if (!Config.I.enumTypeList.Contains(dataName))
+                                {
+                                    Config.I.enumTypeList.Add(dataName);
+                                    tempEnumStr = FileTool.ReadString($"{classPath}EnumType.cs") + tempEnumStr;
+                                    FileTool.WriteString($"{classPath}EnumType.cs", tempEnumStr);
+                                }
 
-                            string enumStr2 = @"
+                                string enumStr2 = @"
         public dataType dataName{ get; private set; }
 ";
-                            enumStr2 = enumStr2.Replace("dataType", "Enum" + dataName);
-                            enumStr2 = enumStr2.Replace("dataName", dataName);
+                                enumStr2 = enumStr2.Replace("dataType", "Enum" + dataName);
+                                enumStr2 = enumStr2.Replace("dataName", dataName);
 
-                            tempVal += enumStr2;
-                            break;
-                        }
+                                cshapClassStr += enumStr2;
+                                break;
+                            }
                         case "array":
-                        {
+
                             string arrStr = @"
         public List<Type> arrName{ get; private set; }
 ";
                             arrStr = arrStr.Replace("Type", add);
                             arrStr = arrStr.Replace("arrName", dataName);
-                            tempVal += arrStr;
+                            cshapClassStr += arrStr;
 
-                            if (add == "string")
-                                arrayDic.Add(dataName, true);
-                            else
-                                arrayDic.Add(dataName, false);
+
                             break;
-                        }
-                        case "dic" when dicDic.ContainsKey(dataName):
-                        {
-                            if (!dicDic[dataName].Contains(kv_key))
-                                dicDic[dataName].Add(kv_key);
-
-                            dataNameDic.Add(i, dataName);
-                            dataTypeDic.Add(i, dataType);
-                            continue;
-                        }
                         case "dic":
-                        {
-                            string dicStr = @"
+                            {
+                                string dicStr = @"
         public Dictionary<key,value> dicName{ get; private set; }
 ";
-                            string[] str1s = add.ToString().Split(',');
-                            dicStr = dicStr.Replace("key", str1s[0]);
-                            dicStr = dicStr.Replace("value", str1s[1]);
-                            dicStr = dicStr.Replace("dicName", dataName);
-                            tempVal += dicStr;
+                                string[] str1s = add.ToString().Split(',');
+                                dicStr = dicStr.Replace("key", str1s[0]);
+                                dicStr = dicStr.Replace("value", str1s[1]);
+                                dicStr = dicStr.Replace("dicName", dataName);
 
-                            dicDic.Add(dataName, new List<string>());
-                            dicDic[dataName].Add(kv_key);
-                            dicTypeDic[dataName] = str1s[1] == "string";
-                            break;
-                        }
+                                if (!cshapClassStr.Contains(dicStr))
+                                    cshapClassStr += dicStr;
+                                break;
+                            }
                         default:
-                        {
-                            if (dataType.ToLower() == "vector3")
                             {
-                                string vecStr = @"
+                                if (dataType.ToLower() == "vector3")
+                                {
+                                    string vecStr = @"
         public Vector3 name{ get; private set; }
 ";
-                                vecStr = vecStr.Replace("name", dataName);
-                                tempVal += vecStr;
-                            }
-                            else if (dataType.ToLower() == "vector2")
-                            {
-                                string vecStr = @"
+                                    vecStr = vecStr.Replace("name", dataName);
+                                    cshapClassStr += vecStr;
+                                }
+                                else if (dataType.ToLower() == "vector2")
+                                {
+                                    string vecStr = @"
         public Vector2 name{ get; private set; }
 ";
-                                vecStr = vecStr.Replace("name", dataName);
-                                tempVal += vecStr;
-                            }
-                            else if (dataType.ToLower() == "color")
-                            {
-                                string colorStr = @"
+                                    vecStr = vecStr.Replace("name", dataName);
+                                    cshapClassStr += vecStr;
+                                }
+                                else if (dataType.ToLower() == "color")
+                                {
+                                    string colorStr = @"
         public Color name{ get; private set; }
 ";
-                                colorStr = colorStr.Replace("name", dataName);
-                                tempVal += colorStr;
-                            }
-                            else if (dataType.ToLower() == "int" ||
-                                     dataType.ToLower() == "float" ||
-                                     dataType.ToLower() == "string" ||
-                                     dataType.ToLower() == "bool")
-                            {
-                                string tempPropertyStr = propertyStr;
-                                tempPropertyStr = tempPropertyStr.Replace("dataType", dataType);
-                                tempPropertyStr = tempPropertyStr.Replace("dataName", dataName);
+                                    colorStr = colorStr.Replace("name", dataName);
+                                    cshapClassStr += colorStr;
+                                }
+                                else if (dataType.ToLower() == "int" ||
+                                         dataType.ToLower() == "float" ||
+                                         dataType.ToLower() == "string" ||
+                                         dataType.ToLower() == "bool")
+                                {
+                                    string tempPropertyStr = propertyStr;
+                                    tempPropertyStr = tempPropertyStr.Replace("dataType", dataType);
+                                    tempPropertyStr = tempPropertyStr.Replace("dataName", dataName);
 
-                                tempVal += tempPropertyStr;
-                            }
-                            else if (dataType != "")
-                            {
-                                Logger.Error($@"====Error====
+                                    cshapClassStr += tempPropertyStr;
+                                }
+                                else if (dataType != "")
+                                {
+                                    Logger.Error($@"====Error====
 Path:{path}
 Sheet:{className},Columns:{columns},Rows:{2}
 ErrorType:{dataType}
 ");
+                                }
+
+                                break;
                             }
-
-                            break;
-                        }
                     }
-
-                    dataNameDic.Add(i, dataName);
-                    dataTypeDic.Add(i, dataType);
                 }
 
-                tempVal += parseStr;
-                FileTool.WriteString($"{classPath}{className}.cs", tempVal);
-                
+                cshapClassStr += parseStr;
+                FileTool.WriteString($"{classPath}{className}.cs", cshapClassStr);
+                #endregion
+
+                #region 生成数据文件
+                string rowData = "";
                 for (int i = 3; i < rows; ++i)
                 {
-                    if (result.Tables[index].Rows[i][0].ToString() != "")
+                    if (curSheet.Rows[i][0].ToString() != "")
                         continue;
-
-                    Dictionary<string, bool> dicAddedDic = new Dictionary<string, bool>();
-                    foreach (var it in dicTypeDic)
-                    {
-                        dicAddedDic[it.Key] = false;
-                    }
 
                     for (int j = 1; j < columns; ++j)
                     {
-                        try
-                        {
-                            AddData(result.Tables[index].Rows[i][j].ToString(), dataNameDic[j], dataTypeDic[j], enumDic, arrayDic, dicDic, dicTypeDic, dicAddedDic);
-                        }
-                        catch
-                        {
-                            Logger.Error($@"Path:{path}
-Line:Rows--{i}Columns--{j}");
-                        }
+                        rowData += $"{curSheet.Rows[1][j]}{split01}{curSheet.Rows[2][j]}{split01}{curSheet.Rows[i][j]}{split02}";
                     }
-                    Logger.LogCls($"Rows:{i}");
+                    rowData = rowData.Substring(0, rowData.Length - 1);
+                    rowData += split03;
+                }
+                rowData = rowData.Substring(0, rowData.Length - 1);
 
-                    dataStr = dataStr.Substring(0, dataStr.Length - 1);
-                    dataStr += "},{";
+                //记录枚举信息
+                Dictionary<string, Dictionary<string, int>> enumTypesDic = new Dictionary<string, Dictionary<string, int>>();
+
+                for (int j = 1; j < columns; ++j)
+                {
+                    if (curSheet.Rows[1][j].ToString() == "enum")
+                    {
+                        Dictionary<string, int> enumTemp = new Dictionary<string, int>();
+                        int count = 0;
+                        for (int k = 3; k < rows; ++k)
+                        {
+                            if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
+                            {
+                                enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
+                                count++;
+                            }
+                        }
+
+                        enumTypesDic.Add(curSheet.Rows[2][j].ToString(), enumTemp);
+                    }
                 }
 
-                SaveData(dataStr, className);
+                CreateData(rowData, enumTypesDic);
+
+
                 Logger.Log($"{className}.cs Created");
+                #endregion
             }
         }
 
@@ -356,7 +338,7 @@ namespace Database
             return Regex.Replace(value, @"\b(\w)|\s(\w)", match => match.Value.ToLower());
         }
 
-        private static DataSet OpenExcel(string path)
+        public static DataSet OpenExcel(string path)
         {
             using (FileStream fileStream = File.Open(path, FileMode.Open, FileAccess.Read))
             {
@@ -366,145 +348,11 @@ namespace Database
             }
         }
 
-        public void Test(string path)
-        {
-            DataSet result = OpenExcel(path);
-            Logger.Log(result.Tables[0].Rows[2][4].ToString());
-            Logger.Log(result.Tables[0].Rows[3][4].ToString());
-            Logger.Log(result.Tables[0].Rows[4][4].ToString());
-        }
-
-        private void AddData(string data, string name, string type, Dictionary<string, Dictionary<string, int>> enumDic, Dictionary<string, bool> arrayDic, Dictionary<string, List<string>> dicDic, Dictionary<string, bool> dicTypeDic, Dictionary<string, bool> dicAddedDic)
-        {
-            switch (Config.I.exportType)
-            {
-                case Config.ExportType.Json: AddJsonData(data, name, type, enumDic, arrayDic, dicDic, dicTypeDic, dicAddedDic); break;
-                case Config.ExportType.Bytes: AddBytesData(data); break;
-                case Config.ExportType.Protobuf: AddProtobufData(data); break;
-                case Config.ExportType.Xml:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private void AddJsonData(string data, string name, string type, Dictionary<string, Dictionary<string, int>> enumDic, Dictionary<string, bool> arrayDic, Dictionary<string, List<string>> dicDic, Dictionary<string, bool> dicTypeDic, Dictionary<string, bool> dicAddedDic)
-        {
-            switch (type)
-            {
-                case "int":
-                case "float":
-                case "bool":
-                {
-                    if (type == "bool")
-                    {
-                        if (data == "0")
-                            data = "false";
-                        else
-                            data = "true";
-                    }
-                    dataStr += $"\"{name}\":{data},";
-                    break;
-                }
-                case "string":
-                    dataStr += $"\"{name}\":\"{data}\",";
-                    break;
-                case "enum":
-                    dataStr += $"\"{name}\":{enumDic[name][data]},";
-                    break;
-                case "array":
-                {
-                    string[] arrStrs = data.Split(',');
-                    string tempStr11 = "";
-                    for (int i = 0; i < arrStrs.Length; i++)
-                    {
-                        if (!arrayDic[name])
-                            tempStr11 += arrStrs[i] + ",";
-                        else
-                            tempStr11 += $"\"{arrStrs[i]}\",";
-                    }
-                    tempStr11 = tempStr11.Substring(0, tempStr11.Length - 1);
-
-                    dataStr += $"\"{name}\":[{tempStr11}],";
-                    break;
-                }
-                case "color":
-                {
-                    string[] tempStrs = data.Split(',');
-                    string tempStr11 = "";
-                    tempStr11 = $"{{\"r\":{float.Parse(tempStrs[0])},\"g\":{float.Parse(tempStrs[1])},\"b\":{float.Parse(tempStrs[2])},\"a\":{float.Parse(tempStrs[3])}}},";
-                    dataStr += $"\"{name}\":{tempStr11}";
-                    break;
-                }
-                case "vector2":
-                {
-                    string[] tempStrs = data.Split(',');
-                    string tempStr11 = "";
-                    tempStr11 = $"{{\"x\":{float.Parse(tempStrs[0])},\"y\":{float.Parse(tempStrs[1])}}},";
-                    dataStr += $"\"{name}\":{tempStr11}";
-                    break;
-                }
-                case "vector3":
-                {
-                    string[] tempStrs = data.Split(',');
-                    string tempStr11 = "";
-                    tempStr11 = $"{{\"x\":{float.Parse(tempStrs[0])},\"y\":{float.Parse(tempStrs[1])},\"z\":{float.Parse(tempStrs[2])}}},";
-                    dataStr += $"\"{name}\":{tempStr11}";
-                    break;
-                }
-                case "dic" when !dicAddedDic[name]:
-                {
-                    dicAddedDic[name] = true;
-                    if (dicTypeDic[name])
-                    {
-                        dataStr += $"\"{name}\":{{\"{dicDic[name][0]}\":\"{data}\",";
-                    }
-                    else
-                    {
-                        dataStr += $"\"{name}\":{{\"{dicDic[name][0]}\":{data},";
-                    }
-                    dicIndex++;
-                    break;
-                }
-                case "dic":
-                {
-                    if (dicTypeDic[name])
-                    {
-                        dataStr += $"\"{dicDic[name][dicIndex]}\":\"{data}\",";
-                    }
-                    else
-                    {
-                        dataStr += $"\"{dicDic[name][dicIndex]}\":{data},";
-                    }
-                    dicIndex++;
-                    if (dicIndex == dicDic[name].Count)
-                    {
-                        dataStr = dataStr.Substring(0, dataStr.Length - 1);
-                        dataStr += "},";
-                        dicIndex = 0;
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        private void AddBytesData(string data)
-        {
-
-        }
-
-        private void AddProtobufData(string data)
-        {
-
-        }
-
         private void SaveData(string dataStr, string className)
         {
             switch (Config.I.exportType)
             {
                 case Config.ExportType.Json:
-                    dataStr = "[{" + dataStr.Substring(0, dataStr.Length - 2) + "]";
                     FileTool.WriteString($"{Config.I.dataPath}/Json/{className}.json", dataStr);
                     break;
                 case Config.ExportType.Bytes: FileTool.WriteString($"{Config.I.dataPath}{className}", dataStr); break;
@@ -512,5 +360,135 @@ namespace Database
             }
         }
 
+
+        private void CreateData(string data, Dictionary<string, Dictionary<string, int>> enumTypesDic)
+        {
+            switch (Config.I.exportType)
+            {
+                case Config.ExportType.Json:
+                    CreateJson(data, enumTypesDic);
+                    break;
+                case Config.ExportType.Bytes:
+                    CreateBytes(data, enumTypesDic);
+                    break;
+            }
+        }
+
+        private string CreateJson(string data, Dictionary<string, Dictionary<string, int>> enumTypesDic)
+        {
+            string jsonData = "[";
+            string[] rowStrs = data.Split(split03);
+            int rowNum = 0;
+            foreach (var rowStr in rowStrs)
+            {
+                string[] colStrs = rowStr.Split(split02);
+                bool isDic = false;
+                bool isFistDic = true;
+                jsonData += "{";
+                for (int i = 0; i < colStrs.Length; i++)
+                {
+                    string[] eachStrs = colStrs[i].Split(split01);
+
+                    if (eachStrs[0].ToLower().StartsWith("dic"))
+                    {
+                        isDic = true;
+                        eachStrs[0] = eachStrs[0].Split('<')[1].Split('>')[0];
+                        string[] dicTypes = eachStrs[0].Split(',');
+                        string[] dicDataStrs = eachStrs[1].Split(':');
+                        if (isFistDic)
+                        {
+                            isFistDic = false;
+                            jsonData += $"\"{UpperFirstLetter(dicDataStrs[0])}\":{{";
+                        }
+
+                        if (dicTypes[0] == "string")
+                            jsonData += $"\"{UpperFirstLetter(dicDataStrs[1])}\":";
+                        else
+                            jsonData += $"{UpperFirstLetter(dicDataStrs[1])}:";
+
+                        if (dicTypes[1] == "string")
+                            jsonData += $"\"{eachStrs[2]}\",";
+                        else
+                            jsonData += $"{eachStrs[2]},";
+                    }
+                    else
+                    {
+                        if (isDic)
+                        {
+                            isDic = false;
+                            isFistDic = true;
+                            jsonData = jsonData.Substring(0, jsonData.Length - 1);
+                            jsonData += "},";
+                        }
+
+                        switch (eachStrs[0].ToLower())
+                        {
+                            case "int":
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{ int.Parse(eachStrs[2])}";
+                                break;
+                            case "float":
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{float.Parse(eachStrs[2])}";
+                                break;
+                            case "bool":
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{eachStrs[2].ToLower()}";
+                                break;
+                            case "string":
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":\"{eachStrs[2]}\"";
+                                break;
+                            case "string[]":
+                                string[] tempStrs = eachStrs[2].Split(',');
+                                eachStrs[2] = "";
+                                foreach (var str in tempStrs)
+                                {
+                                    eachStrs[2] += $"\"{str}\",";
+                                }
+                                eachStrs[2] = eachStrs[2].Substring(0, eachStrs[2].Length - 1);
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2]}]";
+                                break;
+                            case "int[]":
+                            case "float[]":
+                            case "bool[]":
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2].ToLower()}]";
+                                break;
+                            case "vector3":
+                                string[] tempStrs1 = eachStrs[2].Split(',');
+                                jsonData +=
+                                    $"\"{UpperFirstLetter(eachStrs[1])}\":{{\"x\":{float.Parse(tempStrs1[0])},\"y\":{float.Parse(tempStrs1[1])},\"z\":{float.Parse(tempStrs1[2])}}}";
+                                break;
+                            case "vector2":
+                                string[] tempStrs2 = eachStrs[2].Split(',');
+                                jsonData +=
+                                    $"\"{UpperFirstLetter(eachStrs[1])}\":{{\"x\":{float.Parse(tempStrs2[0])},\"y\":{float.Parse(tempStrs2[1])}}}";
+                                break;
+                            case "color":
+                                string[] tempStrs3 = eachStrs[2].Split(',');
+                                jsonData +=
+                                    $"\"{UpperFirstLetter(eachStrs[1])}\":{{\"r\":{float.Parse(tempStrs3[0])},\"g\":{float.Parse(tempStrs3[1])},\"b\":{float.Parse(tempStrs3[2])},\"a\":{float.Parse(tempStrs3[2])}}}";
+                                break;
+                            case "enum":
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{enumTypesDic[eachStrs[1]][eachStrs[2]]}";
+                                break;
+                            default:
+                                Logger.Error($"wrong type int row:{rowNum}--column:{i}");
+                                break;
+                        }
+                        jsonData += ",";
+                    }
+                }
+                jsonData = jsonData.Substring(0, jsonData.Length - 1);
+                jsonData += "},";
+                rowNum++;
+            }
+
+            jsonData = jsonData.Substring(0, jsonData.Length - 1) + "]";
+
+            SaveData(jsonData, className);
+            return jsonData;
+        }
+
+        private void CreateBytes(string data, Dictionary<string, Dictionary<string, int>> enumTypesDic)
+        {
+
+        }
     }
 }

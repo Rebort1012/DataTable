@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DataTable
 {
-    internal static class Logger
+    static class Logger
     {
         public static void Log(Object value)
         {

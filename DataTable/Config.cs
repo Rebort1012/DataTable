@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace DataTable
 {
-    internal class Config
+    class Config
     {
         private static Config instance;
         public static Config I => instance ?? (instance = new Config());
