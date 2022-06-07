@@ -37,6 +37,7 @@ namespace Database
         {
             string[] tempStrs = data.Split('-');
             int count = -1;
+            
             Id = int.Parse(tempStrs[count++]);
             Name = tempStrs[count++];
             PerfabName = tempStrs[count++];
@@ -55,6 +56,7 @@ namespace Database
         {
             using (BinaryReader rd = new BinaryReader(ms))
             {
+                
                 Id = rd.ReadInt32();
                 Name = rd.ReadString();
                 PerfabName = rd.ReadString();
