@@ -49,6 +49,7 @@ namespace Database
         {
             string[] tempStrs = data.Split('-');
             int count = -1;
+            
             SkillId = int.Parse(tempStrs[count++]);
             SkillName = tempStrs[count++];
             Describe = tempStrs[count++];
@@ -73,6 +74,7 @@ namespace Database
         {
             using (BinaryReader rd = new BinaryReader(ms))
             {
+                
                 SkillId = rd.ReadInt32();
                 SkillName = rd.ReadString();
                 Describe = rd.ReadString();

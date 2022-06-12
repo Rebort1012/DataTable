@@ -33,23 +33,24 @@ namespace Database
         {
             string[] tempStrs = data.Split('-');
             int count = -1;
+            
             Id = int.Parse(tempStrs[count++]);
             Hp = float.Parse(tempStrs[count++]);
             Name = tempStrs[count++];
             IsHero = int.Parse(tempStrs[count++]) != 0;
-            string[] tempArr = tempStrs[count++].Split(',');
+            string[] tempArr = tempStrs[count++].split(',');
             foreach(string str in tempArr)
             {
                 Params.Add(int.Parse(str));
             };
-            tempArr = tempStrs[count++].Split(',');
+            tempArr = tempStrs[count++].split(',');
             foreach(string str in tempArr)
             {
                 Descrip.Add(str);
             };
-            tempArr = tempStrs[count++].Split(',');
+            tempArr = tempStrs[count++].split(',');
             Pos = new Vector3(float.Parse(tempArr[0]),float.Parse(tempArr[1]),float.Parse(tempArr[2]));
-            tempArr = tempStrs[count++].Split(',');
+            tempArr = tempStrs[count++].split(',');
             OldCol = new Color(float.Parse(tempArr[0]),float.Parse(tempArr[1]),float.Parse(tempArr[2]),float.Parse(tempArr[3]));
                 Job = (EnumJob)int.Parse(tempStrs[count++]);
         }
@@ -58,6 +59,7 @@ namespace Database
         {
             using (BinaryReader rd = new BinaryReader(ms))
             {
+                
                 Id = rd.ReadInt32();
                 Hp = rd.ReadSingle();
                 Name = rd.ReadString();
@@ -65,7 +67,7 @@ namespace Database
                 int count = rd.ReadInt16();
                 for(int i = 0; i < count; i++)
                 {
-                    Params.Add(rd.ReadInt32());
+                    Params.Add(rd.ReadInt());
                 }
             
                 count = rd.ReadInt16();

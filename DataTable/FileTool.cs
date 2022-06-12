@@ -70,5 +70,22 @@ namespace PerillaTable
                 writer.Flush();
             }
         }
+
+        public static void WriteBytes(string path, Stream ms)
+        {
+            ms.Position = 0;
+            FileInfo f = new FileInfo(path);
+            FileStream fs = f.Create();
+            ms.CopyTo(fs);
+            ms.Position = 0;
+            fs.Close();
+        }
+
+        public static BinaryReader ReadBytes(string path)
+        {
+            FileStream fs = new FileInfo(path).OpenRead();
+            BinaryReader reader = new BinaryReader(fs);
+            return reader;
+        }
     }
 }

@@ -1,46 +1,54 @@
+﻿using PerillaTable;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using System.IO;
 
 namespace Database
 {
+    public enum EnumJob
+    {
+        Bow,
+        Magic,
+        Sword,
+    }
+
     [Serializable]
-    public class Hero: DataItem
+    public class Hero : DataItem
     {
 
-        public int Id{ get;private set; }
+        public int Id { get; private set; }
 
-        public string Name{ get;private set; }
+        public string Name { get; private set; }
 
-        public string PerfabName{ get;private set; }
+        public string PerfabName { get; private set; }
 
-        public EnumJob Job{ get; private set; }
+        public EnumJob Job { get; private set; }
 
-        public int Icon{ get;private set; }
+        public int Icon { get; private set; }
 
-        public int MP{ get;private set; }
+        public int MP { get; private set; }
 
-        public int Exp{ get;private set; }
+        public int Exp { get; private set; }
 
-        public int Rank{ get;private set; }
+        public int Rank { get; private set; }
 
-        public int AttackID{ get;private set; }
+        public int AttackID { get; private set; }
 
-        public int SkillID{ get;private set; }
+        public int SkillID { get; private set; }
 
-        public bool IsHero{ get;private set; }
+        public bool IsHero { get; private set; }
 
-        public int TalentID{ get;private set; }
+        public int TalentID { get; private set; }
 
         public override void ParseByString(string data)
         {
             string[] tempStrs = data.Split('-');
             int count = -1;
+
             Id = int.Parse(tempStrs[count++]);
             Name = tempStrs[count++];
             PerfabName = tempStrs[count++];
-                Job = (EnumJob)int.Parse(tempStrs[count++]);
+            Job = (EnumJob)int.Parse(tempStrs[count++]);
             Icon = int.Parse(tempStrs[count++]);
             MP = int.Parse(tempStrs[count++]);
             Exp = int.Parse(tempStrs[count++]);
@@ -69,5 +77,10 @@ namespace Database
                 TalentID = rd.ReadInt32();
             }
         }
+
+        public override string ToString()
+        {
+            return $"{Id},{Name},{PerfabName}";
+        }
     }
-}   
+}

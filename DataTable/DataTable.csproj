@@ -60,8 +60,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="DataMgr.cs" />
     <Compile Include="ExcelTool.cs" />
     <Compile Include="FileTool.cs" />
+    <Compile Include="Hero.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
