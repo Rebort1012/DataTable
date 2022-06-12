@@ -401,9 +401,9 @@ namespace Database
             }
         }
 
-        private void SaveData(string dataStr, string className)
+        private void SaveData(string dataStr, string className,Config.ExportType exportType)
         {
-            switch (Config.I.exportType)
+            switch (exportType)
             {
                 case Config.ExportType.Json:
                     FileTool.WriteString($"{Config.I.dataPath}/Json/{className}.json", dataStr);
@@ -415,14 +415,13 @@ namespace Database
 
         private void CreateData(string data, Dictionary<string, Dictionary<string, int>> enumTypesDic)
         {
-            switch (Config.I.exportType)
+            foreach (var enumType in Config.I.exportType)
             {
-                case Config.ExportType.Json:
+                if (enumType == Config.ExportType.Json)
                     CreateJson(data, enumTypesDic);
-                    break;
-                case Config.ExportType.Bytes:
+
+                else if (enumType == Config.ExportType.Bytes)
                     CreateBytes(data, enumTypesDic);
-                    break;
             }
         }
 
@@ -534,7 +533,7 @@ namespace Database
 
             jsonData = jsonData.Substring(0, jsonData.Length - 1) + "]";
 
-            SaveData(jsonData, className);
+            FileTool.WriteString($"{Config.I.dataPath}/Json/{className}.json", jsonData);
             return jsonData;
         }
 

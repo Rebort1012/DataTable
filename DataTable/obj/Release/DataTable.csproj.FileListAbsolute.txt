@@ -1,0 +1,4 @@
+E:\DataTable\DataTable\obj\Release\DataTable.csproj.AssemblyReference.cache
+E:\DataTable\DataTable\obj\Release\DataTable.csproj.SuggestedBindingRedirects.cache
+E:\DataTable\DataTable\obj\Release\DataTable.exe.config
+E:\DataTable\DataTable\obj\Release\DataTable.csproj.CoreCompileInputs.cache
