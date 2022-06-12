@@ -56,7 +56,6 @@ namespace PerillaTable
                     case "dataPath": dataPath = tempStrs[1]; break;
                     case "classPath": classPath = tempStrs[1]; break;
                     case "exportType":
-
                         string[] types = tempStrs[1].Split('&');
                         foreach (string type in types)
                             exportList.Add((ExportType)Enum.Parse(typeof(ExportType), type));
