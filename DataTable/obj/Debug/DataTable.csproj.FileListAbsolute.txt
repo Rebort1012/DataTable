@@ -23,8 +23,6 @@ E:\DataTable\DataTable\bin\Debug\NPOI.OOXML.dll
 E:\DataTable\DataTable\bin\Debug\NPOI.OpenXml4Net.dll
 E:\DataTable\DataTable\bin\Debug\NPOI.OpenXmlFormats.dll
 E:\DataTable\DataTable\bin\Debug\BouncyCastle.Crypto.xml
-E:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.pdb
-E:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.xml
 E:\DataTable\DataTable\bin\Debug\NPOI.pdb
 E:\DataTable\DataTable\bin\Debug\NPOI.xml
 E:\DataTable\DataTable\bin\Debug\NPOI.OOXML.pdb

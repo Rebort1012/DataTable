@@ -30,13 +30,14 @@ namespace PerillaTable
         public string excelPath;
         public string dataPath;
         public string classPath;
-        public List<ExportType> exportList;
+        public List<ExportType> exportList = null;
         public bool isExportServer;
 
         public readonly List<string> enumTypeList = new List<string>();
 
         private void LoadConfig()
         {
+            exportList= new List<ExportType>(); 
             configPath = "./config.txt";
             string temp = FileTool.ReadString(configPath);
             string[] strs = temp.Split(';');
