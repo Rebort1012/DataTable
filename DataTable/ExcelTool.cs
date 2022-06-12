@@ -415,7 +415,7 @@ namespace Database
 
         private void CreateData(string data, Dictionary<string, Dictionary<string, int>> enumTypesDic)
         {
-            foreach (var enumType in Config.I.exportType)
+            foreach (var enumType in Config.I.exportList)
             {
                 if (enumType == Config.ExportType.Json)
                     CreateJson(data, enumTypesDic);

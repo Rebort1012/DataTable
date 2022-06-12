@@ -30,7 +30,7 @@ namespace PerillaTable
         public string excelPath;
         public string dataPath;
         public string classPath;
-        public List<ExportType> exportType;
+        public List<ExportType> exportList;
         public bool isExportServer;
 
         public readonly List<string> enumTypeList = new List<string>();
@@ -59,7 +59,7 @@ namespace PerillaTable
 
                         string[] types = tempStrs[1].Split('&');
                         foreach (string type in types)
-                            exportType.Add((ExportType)Enum.Parse(typeof(ExportType), type));
+                            exportList.Add((ExportType)Enum.Parse(typeof(ExportType), type));
                         break;
                     case "isExportServer": isExportServer = tempStrs[1].ToLower() != "false"; break;
                 }
