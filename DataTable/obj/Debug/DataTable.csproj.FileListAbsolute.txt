@@ -46,3 +46,5 @@ D:\DataTable\DataTable\bin\Debug\NPOI.OpenXml4Net.xml
 D:\DataTable\DataTable\bin\Debug\NPOI.OpenXmlFormats.pdb
 D:\DataTable\DataTable\obj\Debug\DataTable.exe.config
 D:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.dll
+E:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.pdb
+E:\DataTable\DataTable\bin\Debug\ICSharpCode.SharpZipLib.xml

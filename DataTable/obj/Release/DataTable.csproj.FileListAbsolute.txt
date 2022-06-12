@@ -21,3 +21,6 @@ E:\DataTable\DataTable\bin\Release\NPOI.OpenXmlFormats.pdb
 E:\DataTable\DataTable\obj\Release\DataTable.csproj.CopyComplete
 E:\DataTable\DataTable\obj\Release\DataTable.exe
 E:\DataTable\DataTable\obj\Release\DataTable.pdb
+E:\DataTable\DataTable\bin\Release\ICSharpCode.SharpZipLib.dll
+E:\DataTable\DataTable\bin\Release\ICSharpCode.SharpZipLib.pdb
+E:\DataTable\DataTable\bin\Release\ICSharpCode.SharpZipLib.xml

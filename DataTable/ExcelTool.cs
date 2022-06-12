@@ -40,7 +40,7 @@ namespace PerillaTable
                 //excel中包含多个sheet,sheet名为类型，忽略sheet名中包含"sheet"的表单;
                 if (tableNum > 1)
                 {
-                    className = curSheet.TableName;
+                    className = curSheet.Rows[0][0].ToString().Split('#')[1];
                 }
                 //只有一个sheet的excel文件，文件名为类名;
                 else
@@ -170,9 +170,9 @@ namespace PerillaTable
                             cshapClassStr += enumStr2;
 
                             parseByStr += $@"
-                {dataName} = (Enum{dataName})int.Parse(tempStrs[count++]);";
+            {dataName} = (Enum{dataName})int.Parse(tempStrs[count++]);";
                             parseByBytes += $@"
-                {dataName} = (Enum{dataName})rd.ReadInt16();";
+            {dataName} = (Enum{dataName})rd.ReadInt16();";
 
                             break;
                         case "array":
@@ -221,11 +221,12 @@ namespace PerillaTable
                                 countStr = "count";
 
                             parseByBytes += $@"
-                {countStr} = rd.ReadInt16();
-                for(int i = 0; i < count; i++)
-                {{
-                    {dataName}.Add({typeStr});
-                }}
+            {countStr} = rd.ReadInt16();
+            {dataName} = new List<{add}>();
+            for(int i = 0; i < count; i++)
+            {{
+                {dataName}.Add({typeStr});
+            }}
             ";
                             break;
                         case "dic":
@@ -260,7 +261,7 @@ namespace PerillaTable
             {dataName} = new Vector3(float.Parse(tempArr[0]),float.Parse(tempArr[1]),float.Parse(tempArr[2]));";
 
                                     parseByBytes += $@"
-                {dataName} = new Vector3(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());";
+            {dataName} = new Vector3(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());";
                                 }
                                 else if (dataType.ToLower() == "vector2")
                                 {
@@ -278,7 +279,7 @@ namespace PerillaTable
             {dataName} = new Vector2(float.Parse(tempArr[0]),float.Parse(tempArr[1]));";
 
                                     parseByBytes += $@"
-                {dataName} = new Vector2(rd.ReadSingle(),rd.ReadSingle());";
+            {dataName} = new Vector2(rd.ReadSingle(),rd.ReadSingle());";
                                 }
                                 else if (dataType.ToLower() == "color")
                                 {
@@ -296,28 +297,33 @@ namespace PerillaTable
             {dataName} = new Color(float.Parse(tempArr[0]),float.Parse(tempArr[1]),float.Parse(tempArr[2]),float.Parse(tempArr[3]));";
 
                                     parseByBytes += $@"
-                {dataName} = new Color(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());";
+            {dataName} = new Color(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());";
                                 }
                                 else if (dataType.ToLower() == "int" ||
                                          dataType.ToLower() == "float" ||
                                          dataType.ToLower() == "string" ||
                                          dataType.ToLower() == "bool")
                                 {
-                                    string tempPropertyStr = propertyStr;
-                                    tempPropertyStr = tempPropertyStr.Replace("dataType", dataType);
-                                    tempPropertyStr = tempPropertyStr.Replace("dataName", dataName);
-                                    cshapClassStr += tempPropertyStr;
+                                    if (dataName.ToLower() != "id")
+                                    {
+                                        string tempPropertyStr = propertyStr;
+                                        tempPropertyStr = tempPropertyStr.Replace("dataType", dataType);
+                                        tempPropertyStr = tempPropertyStr.Replace("dataName", dataName);
+                                        cshapClassStr += tempPropertyStr;
+                                    }
 
                                     if (dataType == "int" || dataType == "float")
                                     {
-                                        parseByStr += $@"
+                                 
+                                            parseByStr += $@"
             {dataName} = {dataType}.Parse(tempStrs[count++]);";
-                                        if (dataType == "int")
-                                            parseByBytes += $@"
-                {dataName} = rd.ReadInt32();";
-                                        else
-                                            parseByBytes += $@"
-                {dataName} = rd.ReadSingle();";
+                                            if (dataType == "int")
+                                                parseByBytes += $@"
+            {dataName} = rd.ReadInt32();";
+                                            else
+                                                parseByBytes += $@"
+            {dataName} = rd.ReadSingle();";
+                                        
 
                                     }
                                     else if (dataType == "string")
@@ -325,14 +331,14 @@ namespace PerillaTable
                                         parseByStr += $@"
             {dataName} = tempStrs[count++];";
                                         parseByBytes += $@"
-                {dataName} = rd.ReadString();";
+            {dataName} = rd.ReadString();";
                                     }
                                     else if (dataType == "bool")
                                     {
                                         parseByStr += $@"
             {dataName} = int.Parse(tempStrs[count++]) != 0;";
                                         parseByBytes += $@"
-                {dataName} = rd.ReadBoolean();";
+            {dataName} = rd.ReadBoolean();";
                                     }
                                 }
                                 else if (dataType != "")
@@ -354,7 +360,7 @@ ErrorType:{dataType}
                 cshapClassStr += parseBystrStr;
                 cshapClassStr += parseBytesStr;
 
-                FileTool.WriteString($"{classPath}{className}.cs", cshapClassStr);
+                FileTool.WriteString($"{classPath}D{className}.cs", cshapClassStr);
                 #endregion
 
                 #region 生成数据文件
@@ -375,7 +381,7 @@ using System.IO;
 namespace Database
 {
     [Serializable]
-    public class className: DataItem
+    public class DclassName: DataItem
     {
 ";
             propertyStr = @"
@@ -398,9 +404,7 @@ namespace Database
             parseBytes = @"
         public override void ParseByBytes(MemoryStream ms)
         {
-            using (BinaryReader rd = new BinaryReader(ms))
-            {value
-            }
+            BinaryReader rd = new BinaryReader(ms); value        
         }
     }
 }   
@@ -450,7 +454,11 @@ namespace Database
                         ICell cell = firstRow.GetCell(j);
                         if (cell != null)
                         {
+                            if (cell.CellType == CellType.Formula)
+                                cell.SetCellType(CellType.String);
+                            
                             string cellValue = cell.StringCellValue;
+
                             if (cellValue != null)
                             {
                                 DataColumn column = new DataColumn(cellValue);
@@ -467,12 +475,17 @@ namespace Database
                     for (int j = startRow; j <= rowCount; ++j)
                     {
                         IRow row = sheet.GetRow(j);
-                        if (row == null) continue; //没有数据的行默认是null　　　　　　　
+                        if (row == null) 
+                            continue; //没有数据的行默认是null　　　　　　　
                         DataRow dataRow = data.NewRow();
                         for (int k = row.FirstCellNum; k < cellCount; ++k)
                         {
                             if (row.GetCell(k) != null) //同理，没有数据的单元格都默认是null
-                                dataRow[k] = row.GetCell(k).ToString();
+                            {
+                                if (row.GetCell(k).CellType == CellType.Formula)
+                                    row.GetCell(k).SetCellType(CellType.String);
+                                dataRow[k] = row.GetCell(k).ToString(); 
+                            }
                         }
                         data.Rows.Add(dataRow);
                     }
@@ -625,8 +638,18 @@ namespace Database
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2]}]";
                                 break;
                             case "int[]":
+                                if (eachStrs[2] == "")
+                                    eachStrs[2] = "0";
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2].ToLower()}]";
+                                break;
                             case "float[]":
+                                if (eachStrs[2] == "")
+                                    eachStrs[2] = "0";
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2].ToLower()}]";
+                                break;
                             case "bool[]":
+                                if (eachStrs[2] == "")
+                                    eachStrs[2] = "FALSE";
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2].ToLower()}]";
                                 break;
                             case "vector3":
@@ -752,9 +775,24 @@ namespace Database
                                 {
                                     switch (type.Substring(0, type.Length - 2))
                                     {
-                                        case "int": bw.Write(Convert.ToInt32(str)); break;
-                                        case "float": bw.Write(Convert.ToSingle(str)); break;
-                                        case "bool": bw.Write(Convert.ToBoolean(str)); break;
+                                        case "int":
+                                            if (str != "")
+                                                bw.Write(Convert.ToInt32(str)); 
+                                            else
+                                                bw.Write(0);
+                                            break;
+                                        case "float":
+                                            if (str != "")
+                                                bw.Write(Convert.ToInt32(str));
+                                            else
+                                                bw.Write(0); 
+                                            break;
+                                        case "bool":
+                                            if (str != "")
+                                                bw.Write(Convert.ToInt32(str));
+                                            else
+                                                bw.Write(false);
+                                            break;
                                         case "string": bw.Write(str); break;
                                         default: Logger.Error("no type:" + type); break;
                                     }
@@ -771,7 +809,7 @@ namespace Database
                     }
                     bw.Write(bw.BaseStream.Position - pos);
 
-                    FileTool.WriteBytes($"{Config.I.dataPath}/Bytes/{className}.bytes", ms);
+                    FileTool.WriteBytes($"{Config.I.dataPath}/Bytes/{className}", ms);
                 }
             }
         }
