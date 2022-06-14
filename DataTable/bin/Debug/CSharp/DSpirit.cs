@@ -14,6 +14,8 @@ namespace Database
 
         public EnumElement Element{ get; private set; }
 
+        public int Icon{ get;private set; }
+
         public List<int> Attribute{ get; private set; }
 
         public override void ParseByString(string data)
@@ -24,6 +26,7 @@ namespace Database
             Name = tempStrs[count++];
             GroupID = int.Parse(tempStrs[count++]);
             Element = (EnumElement)int.Parse(tempStrs[count++]);
+            Icon = int.Parse(tempStrs[count++]);
             string[] tempArr = tempStrs[count++].Split(',');
             foreach(string str in tempArr)
             {
@@ -38,6 +41,7 @@ namespace Database
             Name = rd.ReadString();
             GroupID = rd.ReadInt32();
             Element = (EnumElement)rd.ReadInt16();
+            Icon = rd.ReadInt32();
             int count = rd.ReadInt16();
             Attribute = new List<int>();
             for(int i = 0; i < count; i++)

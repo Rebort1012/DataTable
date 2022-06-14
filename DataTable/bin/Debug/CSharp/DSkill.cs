@@ -10,9 +10,13 @@ namespace Database
 
         public string Name{ get;private set; }
 
+        public int Icon{ get;private set; }
+
         public string Desp{ get;private set; }
 
         public EnumElement Element{ get; private set; }
+
+        public List<int> Attribute{ get; private set; }
 
         public float DamageRate{ get;private set; }
 
@@ -28,12 +32,18 @@ namespace Database
             int count = -1;
             Id = int.Parse(tempStrs[count++]);
             Name = tempStrs[count++];
+            Icon = int.Parse(tempStrs[count++]);
             Desp = tempStrs[count++];
             Element = (EnumElement)int.Parse(tempStrs[count++]);
+            string[] tempArr = tempStrs[count++].Split(',');
+            foreach(string str in tempArr)
+            {
+                Attribute.Add(int.Parse(str));
+            };
             DamageRate = float.Parse(tempStrs[count++]);
             Cost = int.Parse(tempStrs[count++]);
             TargetNum = int.Parse(tempStrs[count++]);
-            string[] tempArr = tempStrs[count++].Split(',');
+            tempArr = tempStrs[count++].Split(',');
             foreach(string str in tempArr)
             {
                 BuffList.Add(int.Parse(str));
@@ -45,12 +55,20 @@ namespace Database
             BinaryReader rd = new BinaryReader(ms); 
             Id = rd.ReadInt32();
             Name = rd.ReadString();
+            Icon = rd.ReadInt32();
             Desp = rd.ReadString();
             Element = (EnumElement)rd.ReadInt16();
+            int count = rd.ReadInt16();
+            Attribute = new List<int>();
+            for(int i = 0; i < count; i++)
+            {
+                Attribute.Add(rd.ReadInt32());
+            }
+            
             DamageRate = rd.ReadSingle();
             Cost = rd.ReadInt32();
             TargetNum = rd.ReadInt32();
-            int count = rd.ReadInt16();
+            count = rd.ReadInt16();
             BuffList = new List<int>();
             for(int i = 0; i < count; i++)
             {

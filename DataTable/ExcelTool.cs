@@ -27,6 +27,9 @@ namespace PerillaTable
         private const char split03 = '}';
 
         string className = "";
+
+        Dictionary<string, Dictionary<string, int>> enumTypesDic = new Dictionary<string, Dictionary<string, int>>();
+        Dictionary<string, Dictionary<string, Int16>> enumTypesDicByte = new Dictionary<string, Dictionary<string, Int16>>();
         public void CreateDataTable(string path)
         {
             string classPath = Config.I.classPath;
@@ -314,16 +317,16 @@ namespace PerillaTable
 
                                     if (dataType == "int" || dataType == "float")
                                     {
-                                 
-                                            parseByStr += $@"
+
+                                        parseByStr += $@"
             {dataName} = {dataType}.Parse(tempStrs[count++]);";
-                                            if (dataType == "int")
-                                                parseByBytes += $@"
+                                        if (dataType == "int")
+                                            parseByBytes += $@"
             {dataName} = rd.ReadInt32();";
-                                            else
-                                                parseByBytes += $@"
+                                        else
+                                            parseByBytes += $@"
             {dataName} = rd.ReadSingle();";
-                                        
+
 
                                     }
                                     else if (dataType == "string")
@@ -456,7 +459,7 @@ namespace Database
                         {
                             if (cell.CellType == CellType.Formula)
                                 cell.SetCellType(CellType.String);
-                            
+
                             string cellValue = cell.StringCellValue;
 
                             if (cellValue != null)
@@ -475,7 +478,7 @@ namespace Database
                     for (int j = startRow; j <= rowCount; ++j)
                     {
                         IRow row = sheet.GetRow(j);
-                        if (row == null) 
+                        if (row == null)
                             continue; //没有数据的行默认是null　　　　　　　
                         DataRow dataRow = data.NewRow();
                         for (int k = row.FirstCellNum; k < cellCount; ++k)
@@ -484,7 +487,7 @@ namespace Database
                             {
                                 if (row.GetCell(k).CellType == CellType.Formula)
                                     row.GetCell(k).SetCellType(CellType.String);
-                                dataRow[k] = row.GetCell(k).ToString(); 
+                                dataRow[k] = row.GetCell(k).ToString();
                             }
                         }
                         data.Rows.Add(dataRow);
@@ -502,7 +505,7 @@ namespace Database
             }
         }
 
-        private void SaveData(string dataStr, string className,Config.ExportType exportType)
+        private void SaveData(string dataStr, string className, Config.ExportType exportType)
         {
             switch (exportType)
             {
@@ -546,25 +549,26 @@ namespace Database
             }
             rowData = rowData.Substring(0, rowData.Length - 1);
 
-            //记录枚举信息
-            Dictionary<string, Dictionary<string, int>> enumTypesDic = new Dictionary<string, Dictionary<string, int>>();
-
+            //记录枚举信息   
             for (int j = 1; j < columns; ++j)
             {
                 if (curSheet.Rows[2][j].ToString() == "enum")
                 {
-                    Dictionary<string, int> enumTemp = new Dictionary<string, int>();
-                    int count = 0;
-                    for (int k = 3; k < rows; ++k)
+                    if (!enumTypesDic.ContainsKey(curSheet.Rows[1][j].ToString()))
                     {
-                        if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
+                        Dictionary<string, int> enumTemp = new Dictionary<string, int>();
+                        int count = 0;
+                        for (int k = 3; k < rows; ++k)
                         {
-                            enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
-                            count++;
+                            if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
+                            {
+                                enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
+                                count++;
+                            }
                         }
-                    }
 
-                    enumTypesDic.Add(curSheet.Rows[1][j].ToString(), enumTemp);
+                        enumTypesDic.Add(curSheet.Rows[1][j].ToString(), enumTemp);
+                    }
                 }
             }
 
@@ -638,13 +642,29 @@ namespace Database
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2]}]";
                                 break;
                             case "int[]":
-                                if (eachStrs[2] == "")
-                                    eachStrs[2] = "0";
+                                tempStrs = eachStrs[2].Split(',');
+                                eachStrs[2] = "";
+                                foreach (var str in tempStrs)
+                                {
+                                    if (str == "")
+                                        eachStrs[2] += $"{0},";
+                                    else
+                                        eachStrs[2] += $"{str},";
+                                }
+                                eachStrs[2] = eachStrs[2].Substring(0, eachStrs[2].Length - 1);
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2].ToLower()}]";
                                 break;
                             case "float[]":
-                                if (eachStrs[2] == "")
-                                    eachStrs[2] = "0";
+                                tempStrs = eachStrs[2].Split(',');
+                                eachStrs[2] = "";
+                                foreach (var str in tempStrs)
+                                {
+                                    if (str == "")
+                                        eachStrs[2] += $"{0},";
+                                    else
+                                        eachStrs[2] += $"{str},";
+                                }
+                                eachStrs[2] = eachStrs[2].Substring(0, eachStrs[2].Length - 1);
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":[{eachStrs[2].ToLower()}]";
                                 break;
                             case "bool[]":
@@ -690,24 +710,27 @@ namespace Database
 
         private void CreateBytes(DataTable curSheet, int rows, int columns)
         {
-            Dictionary<string, Dictionary<string, Int16>> enumTypesDic = new Dictionary<string, Dictionary<string, Int16>>();
+            //Dictionary<string, Dictionary<string, Int16>> enumTypesDic = new Dictionary<string, Dictionary<string, Int16>>();
 
             for (int j = 1; j < columns; ++j)
             {
                 if (curSheet.Rows[2][j].ToString() == "enum")
                 {
-                    Dictionary<string, Int16> enumTemp = new Dictionary<string, Int16>();
-                    Int16 count = 0;
-                    for (int k = 3; k < rows; ++k)
+                    if (!enumTypesDicByte.ContainsKey(curSheet.Rows[1][j].ToString()))
                     {
-                        if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
+                        Dictionary<string, Int16> enumTemp = new Dictionary<string, Int16>();
+                        Int16 count = 0;
+                        for (int k = 3; k < rows; ++k)
                         {
-                            enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
-                            count++;
+                            if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
+                            {
+                                enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
+                                count++;
+                            }
                         }
-                    }
 
-                    enumTypesDic.Add(curSheet.Rows[1][j].ToString(), enumTemp);
+                        enumTypesDicByte.Add(curSheet.Rows[1][j].ToString(), enumTemp);
+                    }
                 }
             }
 
@@ -762,7 +785,7 @@ namespace Database
                                     bw.Write(Convert.ToSingle(tempArr[1]));
                                     break;
                                 case "enum":
-                                    bw.Write(enumTypesDic[curSheet.Rows[1][j].ToString()][value]);
+                                    bw.Write(enumTypesDicByte[curSheet.Rows[1][j].ToString()][value]);
                                     break;
                             }
 
@@ -777,7 +800,7 @@ namespace Database
                                     {
                                         case "int":
                                             if (str != "")
-                                                bw.Write(Convert.ToInt32(str)); 
+                                                bw.Write(Convert.ToInt32(str));
                                             else
                                                 bw.Write(0);
                                             break;
@@ -785,7 +808,7 @@ namespace Database
                                             if (str != "")
                                                 bw.Write(Convert.ToInt32(str));
                                             else
-                                                bw.Write(0); 
+                                                bw.Write(0);
                                             break;
                                         case "bool":
                                             if (str != "")
@@ -809,7 +832,7 @@ namespace Database
                     }
                     bw.Write(bw.BaseStream.Position - pos);
 
-                    FileTool.WriteBytes($"{Config.I.dataPath}/Bytes/{className}", ms);
+                    FileTool.WriteBytes($"{Config.I.dataPath}/Bytes/{className}.bytes", ms);
                 }
             }
         }

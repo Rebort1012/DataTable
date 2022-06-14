@@ -13,7 +13,7 @@
             Fire,
             Wand,
             Dark,
-            Sk,
+            Sky,
             Illusory,
         }
 
