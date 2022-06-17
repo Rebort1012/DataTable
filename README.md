@@ -35,6 +35,7 @@ isExportServer:False
 
 2. 双击运行DataTable.exe，等待执行完毕；
 2. 第二行不能有空行；
+2. 枚举单独表Enum.xlsx，其他表中的枚举值必须在这个表中存在，加载时会先生成enum.cs;
 
 ## 配表
 

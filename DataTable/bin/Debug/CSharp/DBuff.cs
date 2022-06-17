@@ -8,13 +8,13 @@ namespace Database
     public class DBuff: DataItem
     {
 
-        public string Name{ get;private set; }
+        public string Name{ get;protected set; }
 
-        public EnumBuff Buff{ get; private set; }
+        public EnumBuff Buff{ get; protected set; }
 
-        public float Duration{ get;private set; }
+        public float Duration{ get;protected set; }
 
-        public float Rate{ get;private set; }
+        public float Rate{ get;protected set; }
 
         public override void ParseByString(string data)
         {

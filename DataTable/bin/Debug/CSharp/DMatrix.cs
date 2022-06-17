@@ -8,7 +8,7 @@ namespace Database
     public class DMatrix: DataItem
     {
 
-        public List<int> SpiritsType{ get; private set; }
+        public List<int> SpiritsType{ get; protected set; }
 
         public override void ParseByString(string data)
         {

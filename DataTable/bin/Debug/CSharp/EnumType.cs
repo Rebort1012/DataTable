@@ -1,35 +1,38 @@
 
-        public enum EnumJob
-        {
-            Sword,
-            Magic,
-            Bow,
-        }
-
-        public enum EnumElement
-        {
-            Ground,
-            Water,
-            Fire,
-            Wand,
-            Dark,
-            Sky,
-            Illusory,
-        }
-
-        public enum EnumBuff
-        {
-            Def,
-            Stick,
-            Miss,
-            Nohurt,
-            Recover,
-            Remove,
-            Atk,
-            Noskill,
-            Weak,
-            Diffuse,
-            Sneer,
-            Poison,
-            Crack,
-        }
+public enum EnumElement
+{
+    Water,
+    Fire,
+    Ground,
+    Wand,
+    Dark,
+    Sky,
+    Illusory,
+    None,
+}
+public enum EnumBuff
+{
+    Speed,
+    Def,
+    Stick,
+    Miss,
+    Nohurt,
+    Recover,
+    Remove,
+    Atk,
+    Noskill,
+    Kill,
+    Weak,
+    Diffuse,
+    Sneer,
+    Poison,
+    Crack,
+}
+public enum EnumArtifactPart
+{
+    Defend,
+    Attack,
+    Spirit,
+    Flight,
+    Auxiliary,
+}

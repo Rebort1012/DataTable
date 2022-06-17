@@ -14,23 +14,18 @@ namespace PerillaTable
 
         static void Main(string[] args)
         {
-            /*          ExcelTool excelTool = new ExcelTool();
-                        FileTool fileTool = new FileTool();
-                        Config.I.exportType = Config.ExportType.Bytes;
-
-                        string path = "./Excel/Hero.xlsx";
-                        excelTool.CreateDataTable(path);
-
-                        DataLoader.GetData<Hero>("DataTable/Bytes/Hero.bytes", 4).ToString();
-
-                        Console.ReadLine();
-
-                        return;*/
-
-
             DateTime time = DateTime.Now.ToUniversalTime();
             ExcelTool excelTool = new ExcelTool();
             FileTool fileTool = new FileTool();
+            try
+            {
+                excelTool.CreatEnumData();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"EnumError:{ex.Message}");
+                Console.ReadKey();
+            }
 
             fileTool.GetAllFiles(Config.I.excelPath);
 
@@ -38,8 +33,21 @@ namespace PerillaTable
             for (int i = 0; i < fileTool.fileList.Count; i++)
             {
                 string item = fileTool.fileList[i];
+
+                if (item.Contains("Enum.xlsx"))
+                    continue;
                 if (item.Contains(".xls"))
-                    excelTool.CreateDataTable(item);
+                {
+                    try
+                    {
+                        excelTool.CreateDataTable(item);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex);
+                        Console.ReadKey();
+                    }
+                }
             }
 
             Logger.Log("TotalSeconds:" + (DateTime.Now.ToUniversalTime() - time).TotalSeconds);

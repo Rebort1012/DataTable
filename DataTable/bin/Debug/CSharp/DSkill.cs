@@ -8,23 +8,23 @@ namespace Database
     public class DSkill: DataItem
     {
 
-        public string Name{ get;private set; }
+        public string Name{ get;protected set; }
 
-        public int Icon{ get;private set; }
+        public int Icon{ get;protected set; }
 
-        public string Desp{ get;private set; }
+        public string Desp{ get;protected set; }
 
-        public EnumElement Element{ get; private set; }
+        public EnumElement Element{ get; protected set; }
 
-        public List<int> Attribute{ get; private set; }
+        public List<int> Attribute{ get; protected set; }
 
-        public float DamageRate{ get;private set; }
+        public float DamageRate{ get;protected set; }
 
-        public int Cost{ get;private set; }
+        public int Cost{ get;protected set; }
 
-        public int TargetNum{ get;private set; }
+        public int TargetNum{ get;protected set; }
 
-        public List<int> BuffList{ get; private set; }
+        public List<int> BuffList{ get; protected set; }
 
         public override void ParseByString(string data)
         {

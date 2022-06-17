@@ -8,23 +8,21 @@ namespace Database
     public class DTest: DataItem
     {
 
-        public float Hp{ get;private set; }
+        public float Hp{ get;protected set; }
 
-        public string Name{ get;private set; }
+        public string Name{ get;protected set; }
 
-        public bool IsHero{ get;private set; }
+        public bool IsHero{ get;protected set; }
 
-        public List<int> Params{ get; private set; }
+        public List<int> Params{ get; protected set; }
 
-        public List<string> Descrip{ get; private set; }
+        public List<string> Descrip{ get; protected set; }
 
-        public Dictionary<string,float> Attribute{ get; private set; }
+        public Dictionary<string,float> Attribute{ get; protected set; }
 
-        public Vector3 Pos{ get; private set; }
+        public Vector3 Pos{ get; protected set; }
 
-        public Color OldCol{ get; private set; }
-
-        public EnumJob Job{ get; private set; }
+        public Color OldCol{ get; protected set; }
 
         public override void ParseByString(string data)
         {
@@ -48,7 +46,6 @@ namespace Database
             Pos = new Vector3(float.Parse(tempArr[0]),float.Parse(tempArr[1]),float.Parse(tempArr[2]));
             tempArr = tempStrs[count++].Split(',');
             OldCol = new Color(float.Parse(tempArr[0]),float.Parse(tempArr[1]),float.Parse(tempArr[2]),float.Parse(tempArr[3]));
-            Job = (EnumJob)int.Parse(tempStrs[count++]);
         }
 
         public override void ParseByBytes(MemoryStream ms)
@@ -73,8 +70,7 @@ namespace Database
             }
             
             Pos = new Vector3(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());
-            OldCol = new Color(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());
-            Job = (EnumJob)rd.ReadInt16();        
+            OldCol = new Color(rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle(),rd.ReadSingle());        
         }
     }
 }   

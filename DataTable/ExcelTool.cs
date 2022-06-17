@@ -30,6 +30,47 @@ namespace PerillaTable
 
         Dictionary<string, Dictionary<string, int>> enumTypesDic = new Dictionary<string, Dictionary<string, int>>();
         Dictionary<string, Dictionary<string, Int16>> enumTypesDicByte = new Dictionary<string, Dictionary<string, Int16>>();
+
+        public void CreatEnumData()
+        {
+            string path = Config.I.excelPath + "enum.xlsx";
+            string classPath = Config.I.classPath;
+            List<DataTable> result = ExcelToDataTable(path);
+            DataTable curSheet = result[0];
+
+            int columns = curSheet.Columns.Count;
+            int rows = curSheet.Rows.Count;
+
+            for (int j = 0; j < columns; ++j)
+            {
+                string enumStrTemp = enumStr;
+                string enumName = curSheet.Rows[0][j].ToString();
+                enumTypesDic.Add(enumName.ToLower(), new Dictionary<string, int>());
+                enumTypesDicByte.Add(enumName.ToLower(), new Dictionary<string, Int16>());
+                int count = 0;
+                Int16 countbyte = 0;
+                enumStrTemp = enumStrTemp.Replace("Type", UpperFirstLetter(enumName));
+
+                for (int i = 1; i < rows; ++i)
+                {
+                    if (curSheet.Rows[i][j].ToString() == "")
+                        break;
+                    string Type = curSheet.Rows[i][j].ToString();
+                    enumTypesDic[enumName.ToLower()].Add(Type.ToLower(), count++);
+                    enumTypesDicByte[enumName.ToLower()].Add(Type.ToLower(), (Int16)countbyte++);
+
+                    enumStrTemp += $@"    {UpperFirstLetter(Type)},
+";
+                }
+
+                enumStrTemp += @"}";
+                string data = File.ReadAllText(classPath + "EnumType.cs");
+                data += enumStrTemp;
+                File.WriteAllText(classPath + "EnumType.cs", data);
+            }
+        }
+
+
         public void CreateDataTable(string path)
         {
             string classPath = Config.I.classPath;
@@ -146,26 +187,8 @@ namespace PerillaTable
                                 tempStrs.Add(strstemp2[0], int.Parse(strstemp2[1]));
                             }
 
-
-                            string tempEnumStr = enumStr.Replace("Type", dataName);
-
-                            foreach (var it in tempStrs)
-                            {
-                                tempEnumStr += $@"            {UpperFirstLetter(it.Key)},
-";
-                            }
-                            tempEnumStr += @"        }
-";
-
-                            if (!Config.I.enumTypeList.Contains(dataName))
-                            {
-                                Config.I.enumTypeList.Add(dataName);
-                                tempEnumStr = FileTool.ReadString($"{classPath}EnumType.cs") + tempEnumStr;
-                                FileTool.WriteString($"{classPath}EnumType.cs", tempEnumStr);
-                            }
-
                             string enumStr2 = @"
-        public dataType dataName{ get; private set; }
+        public dataType dataName{ get; protected set; }
 ";
                             enumStr2 = enumStr2.Replace("dataType", "Enum" + dataName);
                             enumStr2 = enumStr2.Replace("dataName", dataName);
@@ -181,7 +204,7 @@ namespace PerillaTable
                         case "array":
 
                             string arrStr = @"
-        public List<Type> arrName{ get; private set; }
+        public List<Type> arrName{ get; protected set; }
 ";
                             arrStr = arrStr.Replace("Type", add);
                             arrStr = arrStr.Replace("arrName", dataName);
@@ -235,7 +258,7 @@ namespace PerillaTable
                         case "dic":
                             {
                                 string dicStr = @"
-        public Dictionary<key,value> dicName{ get; private set; }
+        public Dictionary<key,value> dicName{ get; protected set; }
 ";
                                 string[] str1s = add.ToString().Split(',');
                                 dicStr = dicStr.Replace("key", str1s[0]);
@@ -251,7 +274,7 @@ namespace PerillaTable
                                 if (dataType.ToLower() == "vector3")
                                 {
                                     string vecStr = @"
-        public Vector3 name{ get; private set; }
+        public Vector3 name{ get; protected set; }
 ";
                                     vecStr = vecStr.Replace("name", dataName);
                                     cshapClassStr += vecStr;
@@ -269,7 +292,7 @@ namespace PerillaTable
                                 else if (dataType.ToLower() == "vector2")
                                 {
                                     string vecStr = @"
-        public Vector2 name{ get; private set; }
+        public Vector2 name{ get; protected set; }
 ";
                                     vecStr = vecStr.Replace("name", dataName);
                                     cshapClassStr += vecStr;
@@ -287,7 +310,7 @@ namespace PerillaTable
                                 else if (dataType.ToLower() == "color")
                                 {
                                     string colorStr = @"
-        public Color name{ get; private set; }
+        public Color name{ get; protected set; }
 ";
                                     colorStr = colorStr.Replace("name", dataName);
                                     cshapClassStr += colorStr;
@@ -388,12 +411,12 @@ namespace Database
     {
 ";
             propertyStr = @"
-        public dataType dataName{ get;private set; }
+        public dataType dataName{ get;protected set; }
 ";
 
             enumStr = @"
-        public enum EnumType
-        {
+public enum EnumType
+{
 ";
 
             parseStr = @"
@@ -549,28 +572,6 @@ namespace Database
             }
             rowData = rowData.Substring(0, rowData.Length - 1);
 
-            //记录枚举信息   
-            for (int j = 1; j < columns; ++j)
-            {
-                if (curSheet.Rows[2][j].ToString() == "enum")
-                {
-                    if (!enumTypesDic.ContainsKey(curSheet.Rows[1][j].ToString()))
-                    {
-                        Dictionary<string, int> enumTemp = new Dictionary<string, int>();
-                        int count = 0;
-                        for (int k = 3; k < rows; ++k)
-                        {
-                            if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
-                            {
-                                enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
-                                count++;
-                            }
-                        }
-
-                        enumTypesDic.Add(curSheet.Rows[1][j].ToString(), enumTemp);
-                    }
-                }
-            }
 
             string jsonData = "[";
             string[] rowStrs = rowData.Split(split03);
@@ -688,7 +689,7 @@ namespace Database
                                     $"\"{UpperFirstLetter(eachStrs[1])}\":{{\"r\":{float.Parse(tempStrs3[0])},\"g\":{float.Parse(tempStrs3[1])},\"b\":{float.Parse(tempStrs3[2])},\"a\":{float.Parse(tempStrs3[2])}}}";
                                 break;
                             case "enum":
-                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{enumTypesDic[eachStrs[1]][eachStrs[2]]}";
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{enumTypesDic[eachStrs[1].ToLower()][eachStrs[2]]}";
                                 break;
                             default:
                                 Logger.Error($"wrong type int row:{rowNum}--column:{i}");
@@ -704,36 +705,12 @@ namespace Database
 
             jsonData = jsonData.Substring(0, jsonData.Length - 1) + "]";
 
-            FileTool.WriteString($"{Config.I.dataPath}/Json/{className}.json", jsonData);
+            FileTool.WriteString($"{Config.I.dataPath}/Json/D{className}.json", jsonData);
             return jsonData;
         }
 
         private void CreateBytes(DataTable curSheet, int rows, int columns)
         {
-            //Dictionary<string, Dictionary<string, Int16>> enumTypesDic = new Dictionary<string, Dictionary<string, Int16>>();
-
-            for (int j = 1; j < columns; ++j)
-            {
-                if (curSheet.Rows[2][j].ToString() == "enum")
-                {
-                    if (!enumTypesDicByte.ContainsKey(curSheet.Rows[1][j].ToString()))
-                    {
-                        Dictionary<string, Int16> enumTemp = new Dictionary<string, Int16>();
-                        Int16 count = 0;
-                        for (int k = 3; k < rows; ++k)
-                        {
-                            if (!enumTemp.ContainsKey(curSheet.Rows[k][j].ToString()))
-                            {
-                                enumTemp.Add(curSheet.Rows[k][j].ToString(), count);
-                                count++;
-                            }
-                        }
-
-                        enumTypesDicByte.Add(curSheet.Rows[1][j].ToString(), enumTemp);
-                    }
-                }
-            }
-
             using (MemoryStream ms = new MemoryStream())
             {
                 int dataCount = -1;
@@ -785,7 +762,7 @@ namespace Database
                                     bw.Write(Convert.ToSingle(tempArr[1]));
                                     break;
                                 case "enum":
-                                    bw.Write(enumTypesDicByte[curSheet.Rows[1][j].ToString()][value]);
+                                    bw.Write(enumTypesDicByte[curSheet.Rows[1][j].ToString().ToLower()][value]);
                                     break;
                             }
 
@@ -832,7 +809,7 @@ namespace Database
                     }
                     bw.Write(bw.BaseStream.Position - pos);
 
-                    FileTool.WriteBytes($"{Config.I.dataPath}/Bytes/{className}.bytes", ms);
+                    FileTool.WriteBytes($"{Config.I.dataPath}/Bytes/D{className}.bytes", ms);
                 }
             }
         }

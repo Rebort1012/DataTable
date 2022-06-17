@@ -8,15 +8,15 @@ namespace Database
     public class DSpirit: DataItem
     {
 
-        public string Name{ get;private set; }
+        public string Name{ get;protected set; }
 
-        public int GroupID{ get;private set; }
+        public int GroupID{ get;protected set; }
 
-        public EnumElement Element{ get; private set; }
+        public EnumElement Element{ get; protected set; }
 
-        public int Icon{ get;private set; }
+        public int Icon{ get;protected set; }
 
-        public List<int> Attribute{ get; private set; }
+        public List<int> Attribute{ get; protected set; }
 
         public override void ParseByString(string data)
         {
