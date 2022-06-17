@@ -1,38 +1,8 @@
 
-public enum EnumElement
-{
-    Water,
-    Fire,
-    Ground,
-    Wand,
-    Dark,
-    Sky,
-    Illusory,
-    None,
-}
-public enum EnumBuff
-{
-    Speed,
-    Def,
-    Stick,
-    Miss,
-    Nohurt,
-    Recover,
-    Remove,
-    Atk,
-    Noskill,
-    Kill,
-    Weak,
-    Diffuse,
-    Sneer,
-    Poison,
-    Crack,
-}
-public enum EnumArtifactPart
+public enum EnumJob
 {
     Defend,
-    Attack,
-    Spirit,
-    Flight,
-    Auxiliary,
+    Assassin,
+    Sword,
+    Magician,
 }
