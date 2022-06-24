@@ -1,3 +1,4 @@
-./DataTable/bin/
-./DataTable/obj/
-./.vs/
+/DataTable/bin/
+/DataTable/obj/
+/.vs/
+/.idea/
