@@ -10,8 +10,6 @@ namespace PerillaTable
 {
     static class Program
     {
-
-
         static void Main(string[] args)
         {
             DateTime time = DateTime.Now.ToUniversalTime();
@@ -38,15 +36,15 @@ namespace PerillaTable
                     continue;
                 if (item.Contains(".xls"))
                 {
-                    try
+                    // try
                     {
                         excelTool.CreateDataTable(item);
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.Error(ex);
-                        Console.ReadKey();
-                    }
+                    /*                 catch (Exception ex)
+                                     {
+                                         Logger.Error(ex);
+                                         Console.ReadKey();
+                                     }*/
                 }
             }
 

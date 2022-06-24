@@ -75,6 +75,8 @@ namespace PerillaTable
         {
             string classPath = Config.I.classPath;
             List<DataTable> result = ExcelToDataTable(path);
+            if (result == null)
+                return;
 
             int tableNum = result.Count;
             for (int index = 0; index < tableNum; index++)
@@ -555,6 +557,9 @@ public enum EnumType
         private string CreateJson(DataTable curSheet, int rows, int columns)
         {
             string rowData = "";
+            if (rows <= 3)
+                return null;
+
             for (int i = 3; i < rows; ++i)
             {
                 if (curSheet.Rows[i][0].ToString().StartsWith("#"))
@@ -689,7 +694,7 @@ public enum EnumType
                                     $"\"{UpperFirstLetter(eachStrs[1])}\":{{\"r\":{float.Parse(tempStrs3[0])},\"g\":{float.Parse(tempStrs3[1])},\"b\":{float.Parse(tempStrs3[2])},\"a\":{float.Parse(tempStrs3[2])}}}";
                                 break;
                             case "enum":
-                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{enumTypesDic[eachStrs[1].ToLower()][eachStrs[2]]}";
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{enumTypesDic[eachStrs[1].ToLower()][eachStrs[2].ToLower()]}";
                                 break;
                             default:
                                 Logger.Error($"wrong type int row:{rowNum}--column:{i}");
@@ -711,6 +716,9 @@ public enum EnumType
 
         private void CreateBytes(DataTable curSheet, int rows, int columns)
         {
+            if (rows <= 3)
+                return;
+
             using (MemoryStream ms = new MemoryStream())
             {
                 int dataCount = -1;
@@ -762,7 +770,7 @@ public enum EnumType
                                     bw.Write(Convert.ToSingle(tempArr[1]));
                                     break;
                                 case "enum":
-                                    bw.Write(enumTypesDicByte[curSheet.Rows[1][j].ToString().ToLower()][value]);
+                                    bw.Write(enumTypesDicByte[curSheet.Rows[1][j].ToString().ToLower()][value.ToLower()]);
                                     break;
                             }
 
