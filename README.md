@@ -10,7 +10,7 @@
 - 支持枚举
 - 支持unity类型vector3,vector2,color
 - 自动生成csharp类
-- 单个excel中多个sheet，依次导出 **sheet名为生成C#类的class名**
+- 单个excel中多个sheet，依次导出 **第一行第一列格子中#{类名} = 生成C#类的class名**
 - 单个sheet,文件名为类名
 - 类型为空的列跳过
 - 第一列标#开始的行跳过
