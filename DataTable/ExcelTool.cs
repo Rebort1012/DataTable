@@ -22,7 +22,7 @@ namespace PerillaTable
         private string parseBytes;
         private string enumStr;
 
-        private const char split01 = '-';
+        private const char split01 = '~';
         private const char split02 = ';';
         private const char split03 = '}';
 
@@ -507,14 +507,16 @@ public enum EnumType
                             continue; //没有数据的行默认是null　　　　　　　
                         DataRow dataRow = data.NewRow();
                         for (int k = row.FirstCellNum; k < cellCount; ++k)
-                        {
+                        {                             
                             if (row.GetCell(k) != null) //同理，没有数据的单元格都默认是null
                             {
+                               
                                 if (row.GetCell(k).CellType == CellType.Formula)
                                     row.GetCell(k).SetCellType(CellType.String);
                                 dataRow[k] = row.GetCell(k).ToString();
                             }
                         }
+             
                         data.Rows.Add(dataRow);
                     }
 
@@ -589,7 +591,7 @@ public enum EnumType
                 jsonData += "{";
                 for (int i = 0; i < colStrs.Length; i++)
                 {
-                    string[] eachStrs = colStrs[i].Split(split01);
+                    string[] eachStrs = colStrs[i].Split(split01);             
 
                     if (eachStrs[0].ToLower().StartsWith("dic"))
                     {
@@ -626,12 +628,18 @@ public enum EnumType
                         switch (eachStrs[0].ToLower())
                         {
                             case "int":
+                                if (string.IsNullOrEmpty(eachStrs[2]))
+                                    eachStrs[2] = "0";
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{ int.Parse(eachStrs[2])}";
                                 break;
                             case "float":
+                                if (string.IsNullOrEmpty(eachStrs[2]))
+                                    eachStrs[2] = "0";
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{float.Parse(eachStrs[2])}";
                                 break;
                             case "bool":
+                                if (string.IsNullOrEmpty(eachStrs[2]))
+                                    eachStrs[2] = "FALSE";
                                 jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{eachStrs[2].ToLower()}";
                                 break;
                             case "string":
@@ -662,6 +670,8 @@ public enum EnumType
                                 break;
                             case "float[]":
                                 tempStrs = eachStrs[2].Split(',');
+
+
                                 eachStrs[2] = "";
                                 foreach (var str in tempStrs)
                                 {
@@ -744,12 +754,18 @@ public enum EnumType
                             switch (type)
                             {
                                 case "int":
+                                    if (string.IsNullOrEmpty(value))
+                                        value = "0";
                                     bw.Write(Convert.ToInt32(value)); break;
                                 case "float":
+                                    if (string.IsNullOrEmpty(value))
+                                        value = "0";
                                     bw.Write(Convert.ToSingle(value)); break;
                                 case "string":
                                     bw.Write(value); break;
                                 case "bool":
+                                    if (string.IsNullOrEmpty(value))
+                                        value = "FALSE";
                                     bw.Write(Convert.ToBoolean(value)); break;
                                 case "vector3":
                                     string[] tempArr = value.Split(',');
@@ -791,13 +807,13 @@ public enum EnumType
                                             break;
                                         case "float":
                                             if (str != "")
-                                                bw.Write(Convert.ToInt32(str));
+                                                bw.Write(Convert.ToSingle(str));
                                             else
                                                 bw.Write(0);
                                             break;
                                         case "bool":
                                             if (str != "")
-                                                bw.Write(Convert.ToInt32(str));
+                                                bw.Write(Convert.ToBoolean(str));
                                             else
                                                 bw.Write(false);
                                             break;
