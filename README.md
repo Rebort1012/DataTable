@@ -2,7 +2,8 @@
 
 ## 功能
 
-![image-20220531144853430](https://img2022.cnblogs.com/blog/2522637/202206/2522637-20220627234401309-1082970503.png)
+
+![image-20220531144853430](https://picsheet.oss-cn-hangzhou.aliyuncs.com/2522637-20220627234401309-1082970503.png)
 
 - 支持int、float、bool、string基础类型
 - 支持数组
