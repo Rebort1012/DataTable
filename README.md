@@ -85,7 +85,7 @@ bytes不支持dic；（好像没有必要，可以创建新表链接过去）
 
 bytes存储结构：
 
-![image-20220607180017443](https://raw.githubusercontent.com/Rebort1012/picgo/main/image-20220607180017443.png)
+![image-20220607180017443](https://picsheet.oss-cn-hangzhou.aliyuncs.com/image-20220607180017443.png)
 
 生成的C#类自带parse方法；
 
