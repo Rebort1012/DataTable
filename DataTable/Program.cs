@@ -1,12 +1,4 @@
-﻿using Database;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PerillaTable
+﻿namespace PerillaTable
 {
     static class Program
     {
@@ -36,15 +28,15 @@ namespace PerillaTable
                     continue;
                 if (item.Contains(".xls"))
                 {
-                    // try
+                    try
                     {
                         excelTool.CreateDataTable(item);
                     }
-                    /*                 catch (Exception ex)
-                                     {
-                                         Logger.Error(ex);
-                                         Console.ReadKey();
-                                     }*/
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex);
+                        Console.ReadKey();
+                    }
                 }
             }
 

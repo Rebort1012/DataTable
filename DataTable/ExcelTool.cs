@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
-using System.Text.RegularExpressions;
-using NPOI.HSSF.UserModel;
+﻿using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
+using System.Data;
+using System.Text.RegularExpressions;
 
 namespace PerillaTable
 {
@@ -507,16 +504,16 @@ public enum EnumType
                             continue; //没有数据的行默认是null　　　　　　　
                         DataRow dataRow = data.NewRow();
                         for (int k = row.FirstCellNum; k < cellCount; ++k)
-                        {                             
+                        {
                             if (row.GetCell(k) != null) //同理，没有数据的单元格都默认是null
                             {
-                               
+
                                 if (row.GetCell(k).CellType == CellType.Formula)
                                     row.GetCell(k).SetCellType(CellType.String);
                                 dataRow[k] = row.GetCell(k).ToString();
                             }
                         }
-             
+
                         data.Rows.Add(dataRow);
                     }
 
@@ -527,7 +524,7 @@ public enum EnumType
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Exception: " + ex.Message);
+                Console.WriteLine("Exception:{0}, datalistCount{1}", ex.Message, dataList.Count);
                 return null;
             }
         }
@@ -591,7 +588,7 @@ public enum EnumType
                 jsonData += "{";
                 for (int i = 0; i < colStrs.Length; i++)
                 {
-                    string[] eachStrs = colStrs[i].Split(split01);             
+                    string[] eachStrs = colStrs[i].Split(split01);
 
                     if (eachStrs[0].ToLower().StartsWith("dic"))
                     {
@@ -630,7 +627,7 @@ public enum EnumType
                             case "int":
                                 if (string.IsNullOrEmpty(eachStrs[2]))
                                     eachStrs[2] = "0";
-                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{ int.Parse(eachStrs[2])}";
+                                jsonData += $"\"{UpperFirstLetter(eachStrs[1])}\":{int.Parse(eachStrs[2])}";
                                 break;
                             case "float":
                                 if (string.IsNullOrEmpty(eachStrs[2]))
