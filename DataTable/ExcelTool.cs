@@ -2,6 +2,7 @@
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 using System.Data;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace PerillaTable
@@ -33,6 +34,7 @@ namespace PerillaTable
             string path = Config.I.excelPath + "enum.xlsx";
             string classPath = Config.I.classPath;
             List<DataTable> result = ExcelToDataTable(path);
+
             DataTable curSheet = result[0];
 
             int columns = curSheet.Columns.Count;
@@ -73,7 +75,10 @@ namespace PerillaTable
             string classPath = Config.I.classPath;
             List<DataTable> result = ExcelToDataTable(path);
             if (result == null)
+            {
+                Logger.Log($"ExcelToDataTable:{path} NULL");
                 return;
+            }
 
             int tableNum = result.Count;
             for (int index = 0; index < tableNum; index++)
@@ -456,14 +461,21 @@ public enum EnumType
 
             List<DataTable> dataList = new List<DataTable>();
             int startRow = 0;
+            string tempPath = $"./{fileName.Split('/')[^1].Replace(".xlsx", "")}.xlsx";
+            if (File.Exists(tempPath))
+                File.Delete(tempPath);
+            File.Copy(fileName, tempPath);
+            var fs = new FileStream(tempPath, FileMode.Open, FileAccess.Read);
+
+            if (fileName.IndexOf(".xlsx") > 0) // 2007版本
+                workbook = new XSSFWorkbook(fs);
+            else if (fileName.IndexOf(".xls") > 0) // 2003版本
+                workbook = new HSSFWorkbook(fs);
+            fs.Close();
+            File.Delete(tempPath);
+
             try
             {
-                var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
-                if (fileName.IndexOf(".xlsx") > 0) // 2007版本
-                    workbook = new XSSFWorkbook(fs);
-                else if (fileName.IndexOf(".xls") > 0) // 2003版本
-                    workbook = new HSSFWorkbook(fs);
-
                 for (int i = 0; i < workbook.NumberOfSheets; ++i)
                 {
                     sheet = workbook.GetSheetAt(i);
@@ -519,7 +531,6 @@ public enum EnumType
 
                     dataList.Add(data);
                 }
-
                 return dataList;
             }
             catch (Exception ex)

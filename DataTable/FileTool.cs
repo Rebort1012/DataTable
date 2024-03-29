@@ -57,8 +57,11 @@ namespace PerillaTable
 
         public static void WriteString(string path, string data)
         {
-            FileInfo fileInfo = new FileInfo(path);
+            string folderPath = Path.GetDirectoryName(path);
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
 
+            FileInfo fileInfo = new FileInfo(path);
             if (!fileInfo.Exists)
             {
                 fileInfo.Create().Close();
@@ -73,6 +76,10 @@ namespace PerillaTable
 
         public static void WriteBytes(string path, Stream ms)
         {
+            string folderPath = Path.GetDirectoryName(path);
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
             ms.Position = 0;
             FileInfo f = new FileInfo(path);
             FileStream fs = f.Create();

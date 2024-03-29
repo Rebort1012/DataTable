@@ -5,5 +5,5 @@ dataPath:./DataTable/;
 #c#类保存路径;
 classPath:./CSharp/;
 #输出类型;
-exportType:Bytes&Json;
+exportType:Json;
 isExportServer:False

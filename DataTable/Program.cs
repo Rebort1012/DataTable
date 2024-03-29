@@ -10,6 +10,7 @@
             try
             {
                 excelTool.CreatEnumData();
+                Logger.Log("Create Enum Completed...");
             }
             catch (Exception ex)
             {
@@ -24,8 +25,9 @@
             {
                 string item = fileTool.fileList[i];
 
-                if (item.Contains("Enum.xlsx"))
+                if (item.Contains("Enum.xlsx") || item.Contains("~$"))
                     continue;
+
                 if (item.Contains(".xls"))
                 {
                     try
